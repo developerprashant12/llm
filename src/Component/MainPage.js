@@ -13,16 +13,15 @@ import {
 
 function MainPage() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [isCheckedAccuracy, setIsCheckedAccuracy] = useState(false);
-  const [isCheckedFavorability, setIsCheckedFavorability] = useState(false);
-  const [isCheckedReach, setIsCheckedReach] = useState(false);
-  const [isCheckedCompetition, setIsCheckedCompetition] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [showData, setShowData] = useState(false);
   //--------------------------------------Select Data-------------------------------------//
   const options = ["GPT4", "GPT4/Bing", "SGE", "BARD", "Llama"];
   const [selectedCount, setSelectedCount] = useState(0);
   const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(false);
+  
 
   const handleCheckboxChange = (label, isChecked) => {
     const updatedSelectedItems = { ...selectedItems, [label]: isChecked };
@@ -75,25 +74,6 @@ function MainPage() {
     setDropdownOpen(!isDropdownOpen);
   };
 
-  const handleFormGroupClick = (checkboxName) => {
-    switch (checkboxName) {
-      case "BrandAccuracy":
-        setIsCheckedAccuracy(!isCheckedAccuracy);
-        break;
-      case "BrandFavorability":
-        setIsCheckedFavorability(!isCheckedFavorability);
-        break;
-      case "BrandReach":
-        setIsCheckedReach(!isCheckedReach);
-        break;
-      case "Competition":
-        setIsCheckedCompetition(!isCheckedCompetition);
-        break;
-      default:
-        break;
-    }
-  };
-
   const toggleChat = () => {
     console.log("hii");
     setIsChatVisible(true);
@@ -104,14 +84,26 @@ function MainPage() {
     setIsChatVisible(false);
   };
 
+   const handleRadioSelection = (option) => {
+     setSelectedOption(option);
+   };
+
+  const handleClickShow = () =>{
+       setShowData(true)
+  }
+
+  const handleClickReset = () =>{
+    setShowData(false);
+  }
+
   return (
-    <div>
+    <div className="">
       <Navbar className="bg-white p-2 mb-5">
         <Container fluid>
           <Navbar.Brand className="navbar-brand mb-0 h1 d-none d-md-block">
             <img
               alt=""
-              src="http://elancethemes.com/36/LLMsApplication/menu.png"
+              src="menu.png"
               width="30"
               height="30"
               className="d-inline-block align-top"
@@ -147,7 +139,7 @@ function MainPage() {
             <Navbar.Text>
               <img
                 alt=""
-                src="http://elancethemes.com/36/LLMsApplication/profile.png"
+                src="profile.png"
                 onClick={toggleDropdown}
                 id="profileImage"
                 style={{ cursor: "pointer" }}
@@ -171,522 +163,721 @@ function MainPage() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Container>
-        <Container className="border border-secondary-subtle">
-          <Container className="mt-2 mb-5">
-            <h5 className="float-start fw-normal text">
-              Find your LLM Benchmark
-            </h5>
-            <Form className="form-inline form-quicksearch d-none d-md-block mx-auto mt-2">
-              <Form.Group>
-                <Form.Control
-                  type="text"
-                  name="firstName"
-                  placeholder="Your Brand/Product"
-                  className="height0 custom-placeholder mb-3"
-                />
-              </Form.Group>
-              <Row className="mb-3 mt-5">
-                <h5 className="float-start fw-normal text">
-                  What Would You Like to Focus On?
-                </h5>
-                <Form.Group
-                  as={Col}
-                  md="6"
-                  onClick={() => handleFormGroupClick("BrandAccuracy")}
-                  className="cursor-pointer"
-                >
-                  <Form.Check
-                    type="checkbox"
+      <Container fluid>
+        <Container className="border border-secondary-subtle borderSet mt">
+          <h4 className="float-start text1">Find your LLM Benchmark</h4>
+          <div className="p-3 mt-5">
+            <Container className=" border border-secondary-subtle back">
+              <Form className="form-inline form-quicksearch mx-auto mt-4 p-3">
+                <Form.Group>
+                  <Form.Control
+                    type="text"
                     name="firstName"
-                    label="Brand Accuracy"
-                    className="height1 custom-checkbox mb-3"
-                    checked={isCheckedAccuracy}
+                    placeholder="Your Brand/Product"
+                    className="height0 custom-placeholder mb-3"
                   />
                 </Form.Group>
+                <Row className="mb-3 mt-4">
+                  <h6 className="float-start text">
+                    What Would You Like to Focus On?
+                  </h6>
+                  <Form.Group
+                    as={Col}
+                    md="6"
+                    className="cursor-pointer"
+                    onClick={() => handleRadioSelection("Brand Accuracy")}
+                  >
+                    <Form.Check
+                      type="radio"
+                      name="firstName"
+                      label="Brand Accuracy"
+                      className="height1 custom-checkbox mb-3"
+                      checked={selectedOption === "Brand Accuracy"}
+                    />
+                  </Form.Group>
+                  <Form.Group
+                    as={Col}
+                    md="6"
+                    className="cursor-pointer"
+                    onClick={() => handleRadioSelection("Brand Favorability")}
+                  >
+                    <Form.Check
+                      type="radio"
+                      name="firstName"
+                      label="Brand Favorability"
+                      className="height1 custom-checkbox mb-3"
+                      checked={selectedOption === "Brand Favorability"}
+                    />
+                  </Form.Group>
+                  <Form.Group
+                    as={Col}
+                    md="6"
+                    className="cursor-pointer"
+                    onClick={() => handleRadioSelection("Brand Reach")}
+                  >
+                    <Form.Check
+                      type="radio"
+                      name="firstName"
+                      label="Brand Reach"
+                      className="height1 custom-checkbox mb-3"
+                      checked={selectedOption === "Brand Reach"}
+                    />
+                  </Form.Group>
+                  <Form.Group
+                    as={Col}
+                    md="6"
+                    className="cursor-pointer"
+                    onClick={() => handleRadioSelection("Competition")}
+                  >
+                    <Form.Check
+                      type="radio"
+                      name="firstName"
+                      label="Competition"
+                      className="height1 custom-checkbox mb-3"
+                      checked={selectedOption === "Competition"}
+                    />
+                  </Form.Group>
 
-                <Form.Group
-                  as={Col}
-                  md="6"
-                  onClick={() => handleFormGroupClick("BrandFavorability")}
-                  className="cursor-pointer"
-                >
-                  <Form.Check
-                    type="checkbox"
-                    name="firstName"
-                    label="Brand Favorability"
-                    className="height1 custom-checkbox mb-3"
-                    checked={isCheckedFavorability}
-                  />
-                </Form.Group>
-                <Form.Group
-                  as={Col}
-                  md="6"
-                  onClick={() => handleFormGroupClick("BrandReach")}
-                  className="cursor-pointer"
-                >
-                  <Form.Check
-                    type="checkbox"
-                    name="firstName"
-                    label="Brand Reach"
-                    className="height1 custom-checkbox mb-3"
-                    checked={isCheckedReach}
-                  />
-                </Form.Group>
+                  {selectedOption === "Brand Accuracy" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="">Brand Accuracy</Card.Title>
+                          <Card.Text>
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </Card.Text>
+                          <ul class="focus-on">
+                            <li>
+                              <input type="checkbox" name="" value="" /> Brand
+                              Description
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Brand
+                              Logo
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Product
+                              Portfolio
+                            </li>
+                            <ul>
+                              <li>Product Description</li>
+                              <li>Price</li>
+                              <li>Retail Distribution</li>
+                            </ul>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Cited
+                              Sources
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Other
+                            </li>
+                          </ul>
+                          <small>
+                            Note: interactive bot would ask what the user would
+                            like to focus on. Prompt is written based on this
+                            feedback
+                          </small>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
 
-                <Form.Group
-                  as={Col}
-                  md="6"
-                  onClick={() => handleFormGroupClick("Competition")}
-                  className="cursor-pointer"
-                >
-                  <Form.Check
-                    type="checkbox"
-                    name="firstName"
-                    label="Competition"
-                    className="height1 custom-checkbox mb-3"
-                    checked={isCheckedCompetition}
-                  />
-                </Form.Group>
-                <Form.Group as={Col} md="6">
-                  <Row>
-                    <Col md="8">
-                      <Dropdown className="dropdownllms">
-                        <Dropdown.Toggle variant="default" id="dropdown-basic">
-                          <span className="dropdown-text lucnhbtn">
-                            {" "}
-                            Select LLM<span>s</span> ({selectedCount} Selected)
-                          </span>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu
-                          style={{
-                            width: "103%",
-                            marginTop: "6px",
-                            marginLeft: "-10px",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          <Form.Check
-                            type="checkbox"
-                            label="Select All"
-                            className="mb-2 text-xxl"
-                            checked={selectAll}
-                            onChange={handleSelectAllChange}
-                          />
-                          <Dropdown.Divider />
+                  {selectedOption === "Brand Favorability" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="">
+                            Brand Favorability
+                          </Card.Title>
+                          <Card.Text>
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </Card.Text>
+                          <ul class="focus-on">
+                            <li>
+                              <input type="checkbox" name="" value="" /> Brand
+                              Strengths and Weaknesses (pros and cons?)
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Top 5
+                              Positive and Negative Attributes
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" />{" "}
+                              Comparison to other competitors
+                            </li>
+                            <ul>
+                              <li>Query which competitors</li>
+                            </ul>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Source
+                              ID
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Other
+                            </li>
+                          </ul>
+                          <small>
+                            Note: interactive bot would ask what the user would
+                            like to focus on. Prompt is written based on this
+                            feedback
+                          </small>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
 
-                          {options.map((option) => (
+                  {selectedOption === "Brand Reach" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="">Brand Reach</Card.Title>
+                          {/* <Card.Text>
+                          What dimensions do you want to focus on (choose all
+                          that apply)
+                        </Card.Text> */}
+                          <ul class="focus-on">
+                            <li>
+                              <input type="checkbox" name="" value="" /> Query
+                              top 3 prompts related to my brand
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> For
+                              these queries, reporting shows:
+                            </li>
+                            <ul>
+                              <li>Mention rate</li>
+                              <li>Sources</li>
+                              <li>Ranking within the query</li>
+                            </ul>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Other
+                            </li>
+                          </ul>
+                          <small>
+                            Prompt or up to 3 prompts are writtent based on
+                            prompt feedback. Also could be a possibility of bot
+                            to recommend prompts.
+                          </small>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
+
+                  {selectedOption === "Competition" && (
+                    <Container className="mb-4">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="">Competition</Card.Title>
+                          {/* <Card.Text>
+                          What dimensions do you want to focus on (choose all
+                          that apply)
+                        </Card.Text> */}
+                          <ul class="focus-on">
+                            <li>
+                              <input type="checkbox" name="" value="" /> Query
+                              Competitive Set
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Which
+                              Dimensions are of interest for competitive set
+                              compared to brand
+                            </li>
+                            <ul>
+                              <li>Query Brand Accuracy</li>
+                              <li>Query Brand Favorability</li>
+                              <li>Cite Sources</li>
+                            </ul>
+                            <li>
+                              <input type="checkbox" name="" value="" /> Other
+                            </li>
+                          </ul>
+                          {/* <small>
+                          Note: interactive bot would ask what the user would
+                          like to focus on. Prompt is written based on this
+                          feedback
+                        </small> */}
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
+                  <Form.Group as={Col} md="10">
+                    <Row>
+                      <Col md="7">
+                        <Dropdown className="dropdownllms">
+                          <Dropdown.Toggle
+                            variant="default"
+                            id="dropdown-basic"
+                          >
+                            <span className="dropdown-text lucnhbtn">
+                              {" "}
+                              Select LLM<span>s</span> ({selectedCount}{" "}
+                              Selected)
+                            </span>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu
+                            style={{
+                              width: "103%",
+                              marginTop: "0px",
+                              marginLeft: "-13px",
+                              borderRadius: "4px",
+                            }}
+                          >
                             <Form.Check
-                              key={option}
                               type="checkbox"
-                              label={option}
-                              className="mb-2"
-                              checked={selectedItems[option] || false}
-                              onChange={(event) =>
-                                handleCheckboxChange(
-                                  option,
-                                  event.target.checked
-                                )
-                              }
+                              label="Select All"
+                              className="mb-2 text-xxl"
+                              checked={selectAll}
+                              onChange={handleSelectAllChange}
                             />
-                          ))}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </Col>
-                    <Col md="4">
-                      <Button
-                        type="button"
-                        name="firstName"
-                        placeholder="Your Brand/Product"
-                        className="height2 mb-3"
-                        style={{
-                          width: "-webkit-fill-available",
-                          backgroundColor: "#3dc863",
-                          color: "white",
-                        }}
-                      >
-                        LAUNCH
-                      </Button>
-                    </Col>
-                  </Row>
-                </Form.Group>
-              </Row>
-            </Form>
-          </Container>
-        </Container>
-        <Row className="mt-5">
-          <Col md="8">
-            <Card className="border border-secondary-subtle mb-5 rounded-0">
-              <Card.Header className="float-start  p-3 bottom">
-                LLMs
-              </Card.Header>
-              <Container className="mt-3">
-                <Card.Body>
-                  <div className="dboxcont">
-                    <nav className="card-header-actions">
-                      <a
-                        className="card-header-action"
-                        aria-expanded="false"
-                        aria-controls="card1"
-                        title="Copy"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <i className="fas fa-clipboard"></i>
-                      </a>
-                    </nav>
-                    <span className="brnd">GPT4</span>
-                    <h4 className="card-title">Brand Accuracy</h4>
-                    <p className="card-text">
-                      What dimensions do you want to focus on (choose all that
-                      apply)
-                    </p>
-                    <ul>
-                      <li>Brand Description</li>
-                      <li>Brand Logo</li>
-                      <li>Product Portfolio</li>
-                      <ul>
-                        <li>Product Description</li>
-                        <li>Price</li>
-                        <li>Retail Distribution</li>
-                      </ul>
-                      <li>Cited Sources</li>
-                      <li>Other</li>
-                    </ul>
-                    <small>
-                      <b>Note:</b> Interactive bot would ask what the user would
-                      like to focus on. Prompt is written based on this feedback
-                    </small>
-                  </div>
-                  <hr />
-                  <div className="dboxcont">
-                    <nav className="card-header-actions">
-                      <a
-                        className="card-header-action"
-                        aria-expanded="false"
-                        aria-controls="card1"
-                        title="Copy"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <i className="fas fa-clipboard"></i>
-                      </a>
-                    </nav>
-                    <span className="brnd">GPT4/Bing</span>
-                    <h4 className="card-title">Brand Accuracy</h4>
-                    <p className="card-text">
-                      What dimensions do you want to focus on (choose all that
-                      apply)
-                    </p>
-                    <ul>
-                      <li>Brand Description</li>
-                      <li>Brand Logo</li>
-                      <li>Product Portfolio</li>
-                      <ul>
-                        <li>Product Description</li>
-                        <li>Price</li>
-                        <li>Retail Distribution</li>
-                      </ul>
-                      <li>Cited Sources</li>
-                      <li>Other</li>
-                    </ul>
-                    <small>
-                      <b>Note:</b> Interactive bot would ask what the user would
-                      like to focus on. Prompt is written based on this feedback
-                    </small>
-                  </div>
-                  <hr />
-                  <div className="dboxcont">
-                    <nav className="card-header-actions">
-                      <a
-                        className="card-header-action"
-                        aria-expanded="false"
-                        aria-controls="card1"
-                        title="Copy"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <i className="fas fa-clipboard"></i>
-                      </a>
-                    </nav>
-                    <span className="brnd">SGE</span>
-                    <h4 className="card-title">Brand Accuracy</h4>
-                    <p className="card-text">
-                      What dimensions do you want to focus on (choose all that
-                      apply)
-                    </p>
-                    <ul>
-                      <li>Brand Description</li>
-                      <li>Brand Logo</li>
-                      <li>Product Portfolio</li>
-                      <ul>
-                        <li>Product Description</li>
-                        <li>Price</li>
-                        <li>Retail Distribution</li>
-                      </ul>
-                      <li>Cited Sources</li>
-                      <li>Other</li>
-                    </ul>
-                    <small>
-                      <b>Note:</b> Interactive bot would ask what the user would
-                      like to focus on. Prompt is written based on this feedback
-                    </small>
-                  </div>
-                  <hr />
-                  <div className="dboxcont">
-                    <nav className="card-header-actions">
-                      <a
-                        className="card-header-action"
-                        aria-expanded="false"
-                        aria-controls="card1"
-                        title="Copy"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <i className="fas fa-clipboard"></i>
-                      </a>
-                    </nav>
-                    <span className="brnd">BARD</span>
-                    <h4 className="card-title">Brand Accuracy</h4>
-                    <p className="card-text">
-                      What dimensions do you want to focus on (choose all that
-                      apply)
-                    </p>
-                    <ul>
-                      <li>Brand Description</li>
-                      <li>Brand Logo</li>
-                      <li>Product Portfolio</li>
-                      <ul>
-                        <li>Product Description</li>
-                        <li>Price</li>
-                        <li>Retail Distribution</li>
-                      </ul>
-                      <li>Cited Sources</li>
-                      <li>Other</li>
-                    </ul>
-                    <small>
-                      <b>Note:</b> Interactive bot would ask what the user would
-                      like to focus on. Prompt is written based on this feedback
-                    </small>
-                  </div>
-                  <hr />
-                  <div className="dboxcont">
-                    <nav className="card-header-actions">
-                      <a
-                        className="card-header-action"
-                        aria-expanded="false"
-                        aria-controls="card1"
-                        title="Copy"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <i className="fas fa-clipboard"></i>
-                      </a>
-                    </nav>
-                    <span className="brnd">LIama</span>
-                    <h4 className="card-title">Brand Accuracy</h4>
-                    <p className="card-text">
-                      What dimensions do you want to focus on (choose all that
-                      apply)
-                    </p>
-                    <ul>
-                      <li>Brand Description</li>
-                      <li>Brand Logo</li>
-                      <li>Product Portfolio</li>
-                      <ul>
-                        <li>Product Description</li>
-                        <li>Price</li>
-                        <li>Retail Distribution</li>
-                      </ul>
-                      <li>Cited Sources</li>
-                      <li>Other</li>
-                    </ul>
-                    <small>
-                      <b>Note:</b> Interactive bot would ask what the user would
-                      like to focus on. Prompt is written based on this feedback
-                    </small>
-                  </div>
-                </Card.Body>
-              </Container>
-            </Card>
-          </Col>
+                            <Dropdown.Divider />
 
-          <Col md="4">
-            <Card className="border border-secondary-subtle mb-2 rounded-0">
-              <Card.Header className="float-start  p-3 bottom">
-                LLMs History
-              </Card.Header>
-              <Container className="mt-3">
-                <Card.Body>
-                  <span className="d-block pb-2">Today</span>
-                  <div className="histoblck">
-                    <h4 className="card-title2">
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="15px"
-                        width="15px"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                      </svg>{" "}
-                      Brand Accuracy...
-                    </h4>
-                    <span style={{ cursor: "pointer" }}>
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                      </svg>
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                      </svg>
-                    </span>
-                  </div>
-                  <div className="histoblck">
-                    <h4 className="card-title2">
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="15px"
-                        width="15px"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                      </svg>{" "}
-                      Brand Favorability...
-                    </h4>
-                    <span style={{ cursor: "pointer" }}>
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                      </svg>
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                      </svg>
-                    </span>
-                  </div>
-                  <hr />
-                  <span className="d-block pb-2">Yesterday</span>
-                  <div className="histoblck">
-                    <h4 className="card-title2">
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="15px"
-                        width="15px"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                      </svg>{" "}
-                      Brand Reach...
-                    </h4>
-                    <span style={{ cursor: "pointer" }}>
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                      </svg>
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="icon-sm"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                      </svg>
-                    </span>
-                  </div>
-                </Card.Body>
-              </Container>
-            </Card>
-          </Col>
-        </Row>
+                            {options.map((option) => (
+                              <Form.Check
+                                key={option}
+                                type="checkbox"
+                                label={option}
+                                className="mb-2"
+                                checked={selectedItems[option] || false}
+                                onChange={(event) =>
+                                  handleCheckboxChange(
+                                    option,
+                                    event.target.checked
+                                  )
+                                }
+                              />
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Col>
+                      <Col md="2">
+                        <Button
+                          type="button"
+                          name="firstName"
+                          placeholder="Your Brand/Product"
+                          className="height2 mb-3"
+                          style={{
+                            width: "-webkit-fill-available",
+                            backgroundColor: "#3dc863",
+                            color: "white",
+                          }}
+                          onClick={handleClickShow}
+                        >
+                          LAUNCH
+                        </Button>
+                      </Col>
+
+                      <Col md="2">
+                        <Button
+                          type="button"
+                          name="firstName"
+                          placeholder="Your Brand/Product"
+                          className="height2 mb-3"
+                          style={{
+                            width: "-webkit-fill-available",
+                            backgroundColor: "#3dc863",
+                            color: "white",
+                          }}
+                          onClick={handleClickReset}
+                        >
+                          RESET
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Form.Group>
+                </Row>
+              </Form>
+            </Container>
+
+            {showData ? (
+              <Row className="mt-5 mb-4">
+                <Col md="8">
+                  <Card className="border border-secondary-subtle rounded-0">
+                    <Card.Header className="float-start  p-3 bottom">
+                      LLMs
+                    </Card.Header>
+                    <Container className="mt-3">
+                      <Card.Body>
+                        <div className="dboxcont">
+                          <nav className="card-header-actions">
+                            <a
+                              className="card-header-action"
+                              aria-expanded="false"
+                              aria-controls="card1"
+                              title="Copy"
+                              style={{ cursor: "pointer" }}
+                            >
+                              <i className="fas fa-clipboard"></i>
+                            </a>
+                          </nav>
+                          <span className="brnd">GPT4</span>
+                          <h4 className="card-title">Brand Accuracy</h4>
+                          <p className="card-text">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </p>
+                          <ul>
+                            <li>Brand Description</li>
+                            <li>Brand Logo</li>
+                            <li>Product Portfolio</li>
+                            <ul>
+                              <li>Product Description</li>
+                              <li>Price</li>
+                              <li>Retail Distribution</li>
+                            </ul>
+                            <li>Cited Sources</li>
+                            <li>Other</li>
+                          </ul>
+                          <small>
+                            <b>Note:</b> Interactive bot would ask what the user
+                            would like to focus on. Prompt is written based on
+                            this feedback
+                          </small>
+                        </div>
+                        <hr />
+                        <div className="dboxcont">
+                          <nav className="card-header-actions">
+                            <a
+                              className="card-header-action"
+                              aria-expanded="false"
+                              aria-controls="card1"
+                              title="Copy"
+                              style={{ cursor: "pointer" }}
+                            >
+                              <i className="fas fa-clipboard"></i>
+                            </a>
+                          </nav>
+                          <span className="brnd">GPT4/Bing</span>
+                          <h4 className="card-title">Brand Accuracy</h4>
+                          <p className="card-text">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </p>
+                          <ul>
+                            <li>Brand Description</li>
+                            <li>Brand Logo</li>
+                            <li>Product Portfolio</li>
+                            <ul>
+                              <li>Product Description</li>
+                              <li>Price</li>
+                              <li>Retail Distribution</li>
+                            </ul>
+                            <li>Cited Sources</li>
+                            <li>Other</li>
+                          </ul>
+                          <small>
+                            <b>Note:</b> Interactive bot would ask what the user
+                            would like to focus on. Prompt is written based on
+                            this feedback
+                          </small>
+                        </div>
+                        <hr />
+                        <div className="dboxcont">
+                          <nav className="card-header-actions">
+                            <a
+                              className="card-header-action"
+                              aria-expanded="false"
+                              aria-controls="card1"
+                              title="Copy"
+                              style={{ cursor: "pointer" }}
+                            >
+                              <i className="fas fa-clipboard"></i>
+                            </a>
+                          </nav>
+                          <span className="brnd">SGE</span>
+                          <h4 className="card-title">Brand Accuracy</h4>
+                          <p className="card-text">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </p>
+                          <ul>
+                            <li>Brand Description</li>
+                            <li>Brand Logo</li>
+                            <li>Product Portfolio</li>
+                            <ul>
+                              <li>Product Description</li>
+                              <li>Price</li>
+                              <li>Retail Distribution</li>
+                            </ul>
+                            <li>Cited Sources</li>
+                            <li>Other</li>
+                          </ul>
+                          <small>
+                            <b>Note:</b> Interactive bot would ask what the user
+                            would like to focus on. Prompt is written based on
+                            this feedback
+                          </small>
+                        </div>
+                        <hr />
+                        <div className="dboxcont">
+                          <nav className="card-header-actions">
+                            <a
+                              className="card-header-action"
+                              aria-expanded="false"
+                              aria-controls="card1"
+                              title="Copy"
+                              style={{ cursor: "pointer" }}
+                            >
+                              <i className="fas fa-clipboard"></i>
+                            </a>
+                          </nav>
+                          <span className="brnd">BARD</span>
+                          <h4 className="card-title">Brand Accuracy</h4>
+                          <p className="card-text">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </p>
+                          <ul>
+                            <li>Brand Description</li>
+                            <li>Brand Logo</li>
+                            <li>Product Portfolio</li>
+                            <ul>
+                              <li>Product Description</li>
+                              <li>Price</li>
+                              <li>Retail Distribution</li>
+                            </ul>
+                            <li>Cited Sources</li>
+                            <li>Other</li>
+                          </ul>
+                          <small>
+                            <b>Note:</b> Interactive bot would ask what the user
+                            would like to focus on. Prompt is written based on
+                            this feedback
+                          </small>
+                        </div>
+                        <hr />
+                        <div className="dboxcont">
+                          <nav className="card-header-actions">
+                            <a
+                              className="card-header-action"
+                              aria-expanded="false"
+                              aria-controls="card1"
+                              title="Copy"
+                              style={{ cursor: "pointer" }}
+                            >
+                              <i className="fas fa-clipboard"></i>
+                            </a>
+                          </nav>
+                          <span className="brnd">LIama</span>
+                          <h4 className="card-title">Brand Accuracy</h4>
+                          <p className="card-text">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </p>
+                          <ul>
+                            <li>Brand Description</li>
+                            <li>Brand Logo</li>
+                            <li>Product Portfolio</li>
+                            <ul>
+                              <li>Product Description</li>
+                              <li>Price</li>
+                              <li>Retail Distribution</li>
+                            </ul>
+                            <li>Cited Sources</li>
+                            <li>Other</li>
+                          </ul>
+                          <small>
+                            <b>Note:</b> Interactive bot would ask what the user
+                            would like to focus on. Prompt is written based on
+                            this feedback
+                          </small>
+                        </div>
+                      </Card.Body>
+                    </Container>
+                  </Card>
+                </Col>
+
+                <Col md="4">
+                  <Card className="border border-secondary-subtle mb-2 rounded-0">
+                    <Card.Header className="float-start  p-3 bottom">
+                      LLMs History
+                    </Card.Header>
+                    <Container className="mt-3">
+                      <Card.Body>
+                        <span className="d-block pb-2">Today</span>
+                        <div className="histoblck">
+                          <h4 className="card-title2">
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="15px"
+                              width="15px"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>{" "}
+                            Brand Accuracy...
+                          </h4>
+                          <span style={{ cursor: "pointer" }}>
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="1em"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M12 20h9"></path>
+                              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="1em"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                          </span>
+                        </div>
+                        <div className="histoblck">
+                          <h4 className="card-title2">
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="15px"
+                              width="15px"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>{" "}
+                            Brand Favorability...
+                          </h4>
+                          <span style={{ cursor: "pointer" }}>
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="1em"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M12 20h9"></path>
+                              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="1em"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                          </span>
+                        </div>
+                        <hr />
+                        <span className="d-block pb-2">Yesterday</span>
+                        <div className="histoblck">
+                          <h4 className="card-title2">
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="15px"
+                              width="15px"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>{" "}
+                            Brand Reach...
+                          </h4>
+                          <span style={{ cursor: "pointer" }}>
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="1em"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M12 20h9"></path>
+                              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                            <svg
+                              stroke="currentColor"
+                              fill="none"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="icon-sm"
+                              height="1em"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                          </span>
+                        </div>
+                      </Card.Body>
+                    </Container>
+                  </Card>
+                </Col>
+              </Row>
+            ) : (
+              ""
+            )}
+          </div>
+        </Container>
+
         <div className="botIcon">
           {/* Chat */}
           <div className="botIconContainer" onClick={toggleChat}>
-            {isChatVisible === false ? <div className="iconInner">
-              <i className="fa fa-commenting" aria-hidden="true"></i>
-            </div> : ""}
-           
+            {isChatVisible === false ? (
+              <div className="iconInner">
+                <i className="fa fa-commenting" aria-hidden="true"></i>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
           {/* Chat */}
           {/* Chat Message */}

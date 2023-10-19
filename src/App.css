@@ -1,6 +1,7 @@
 .App {
-  background-color: #f0f0f0;
-  height: fit-content;
+  background-color: #f6f9fa;
+  height: auto;
+  padding-bottom: 4rem;
 }
 
 .App-logo {
@@ -47,29 +48,32 @@
 }
 
 .height0 {
-  padding: 14px 14px !important;
+  padding: 8px 14px !important;
   border-radius: 2px !important;
   font-size: 20px !important;
   color: #9da3a9 !important;
   box-shadow: none !important;
-  border: none !important;
+  border: 1px solid #9da3a982 !important;
+  font-weight: 100 !important;
 }
 
 .height1 {
-  padding: 14px 14px !important;
+  padding: 8px 14px !important;
   border-radius: 2px !important;
   font-size: 20px !important;
   color: #9da3a9 !important;
   cursor: pointer;
   box-shadow: none !important;
   border: none !important;
+  font-weight: 100 !important;
 }
 
 .height2 {
-  padding: 14px 14px !important;
+  padding: 8px 14px !important;
   border-radius: 2px !important;
   font-size: 20px !important;
   cursor: pointer;
+  font-weight: 100 !important;
 }
 
 .custom-placeholder::placeholder {
@@ -84,24 +88,40 @@
 }
 
 .dropdownllms {
-  padding: 7px 9px !important;
+  padding: 1px 12px !important;
   border-radius: 2px !important;
   font-size: 20px !important;
   color: #9da3a9 !important;
   cursor: pointer;
   border: 1px solid #ced4da !important;
   background-color: #ffffff !important;
+  font-weight: 100 !important;
+}
+
+input.form-check-input {
+  background-image: url('/public/check-mark.png') ;
 }
 
 .dropdown-toggle::after {
   display: inline-block;
-  margin-left: 5.255em !important;
+  margin-left: 12.255em !important;
   vertical-align: 0.255em;
   content: "";
   border-top: 0.3em solid;
   border-right: 0.3em solid transparent;
   border-bottom: 0;
   border-left: 0.3em solid transparent;
+}
+
+
+@media screen and (max-width: 420px) {
+  .dropdown-toggle::after {
+    margin-left: 20px;
+  }
+/* 
+  body {
+    background-color: red !important;
+  } */
 }
 
 .btn.show {
@@ -153,17 +173,21 @@ button:focus:not(:focus-visible) {
 .form-check .form-check-input {
   float: left !important;
   margin-left: 0 !important;
-  border-radius: 2px !important;
+  border-radius: 15px !important;
 }
 
 .custom-checkbox .form-check-input:checked {
   background-color: #3dc863 !important;
   border-color: none !important;
-  border-radius: 2px !important;
+  border-radius: 15px !important;
 }
 .form-check-input:focus {
   box-shadow: none !important;
   border-color: none !important;
+}
+
+.mb{
+  margin-bottom: 5rem;
 }
 
 label {
@@ -187,11 +211,19 @@ label {
   color: #fff;
 }
 
+.whi {
+  background-color: white !important;
+}
+
 .dboxcont .card-header-actions {
   position: absolute;
   right: 18px;
   color: #ffffff94;
   justify-content: flex-end;
+}
+
+ul.focus-on li{
+  margin-bottom: 5px;
 }
 
 .card-header-actions {
@@ -308,7 +340,28 @@ svg:not(:root) {
 }
 
 .text {
-  font-size: 24px;
+  font-size: 18px;
+  font-weight: 500 !important;
+}
+
+.borderSet {
+   position: relative;
+}
+
+.text1 {
+  position: absolute;
+    top: -17px;
+    background: #f6f9fa;
+    padding: 0px 10px;
+    left: 40px;
+}
+
+.back{
+  background-color: #eceff0;
+}
+
+.mt {
+  margin-top: 6rem ;
 }
 
 a {
