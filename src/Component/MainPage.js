@@ -15,13 +15,14 @@ function MainPage() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOptionShow, setSelectedOptionShow] = useState("Company/Brand");
+  const [selectedDotShow, setSelectedDotShow] = useState("Input key Prompt");
   const [showData, setShowData] = useState(false);
   //--------------------------------------Select Data-------------------------------------//
   const options = ["GPT4", "GPT4/Bing", "SGE", "BARD", "Llama"];
   const [selectedCount, setSelectedCount] = useState(0);
   const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(false);
-  
 
   const handleCheckboxChange = (label, isChecked) => {
     const updatedSelectedItems = { ...selectedItems, [label]: isChecked };
@@ -84,17 +85,31 @@ function MainPage() {
     setIsChatVisible(false);
   };
 
-   const handleRadioSelection = (option) => {
-     setSelectedOption(option);
-   };
+  const handleRadioSelection = (option) => {
+    setSelectedOption(option);
+  };
 
-  const handleClickShow = () =>{
-       setShowData(true)
-  }
+  const handleRadioSectionShow = (option) => {
+    setSelectedOptionShow(option);
+  };
 
-  const handleClickReset = () =>{
+  const handleDotShow = (option) => {
+    setSelectedDotShow(option);
+  };
+
+  const handleClickShow = () => {
+    setShowData(true);
+  };
+
+  const handleClickReset = () => {
     setShowData(false);
-  }
+  };
+
+  const dataStyle = {
+    paddingLeft: "0px",
+    fontSize: "17px",
+    backgroundImage: "none",
+  };
 
   return (
     <div className="">
@@ -167,65 +182,184 @@ function MainPage() {
         <Container className="border border-secondary-subtle borderSet mt">
           <h4 className="float-start text1">Find your LLM Benchmark</h4>
           <div className="p-3 mt-5">
-            <Container className=" border border-secondary-subtle back">
-              <Form className="form-inline form-quicksearch mx-auto mt-4 p-3">
-                <Form.Group>
-                  <Form.Control
-                    type="text"
-                    name="firstName"
-                    placeholder="Your Brand/Product"
-                    className="height0 custom-placeholder mb-3"
-                  />
-                </Form.Group>
-                <Row className="mb-3 mt-4">
-                  <h6 className="float-start text">
+            <Container className="back">
+              <Form className="form-inline form-quicksearch mx-auto mt-2 p-3">
+                <Row className="mb-3">
+                  <h6 className="float-start text mb-4 mt-4">
                     What Would You Like to Focus On?
                   </h6>
-                  <Form.Group
-                    as={Col}
-                    md="6"
-                    className="cursor-pointer"
-                    onClick={() => handleRadioSelection("Brand Accuracy")}
-                  >
-                    <Form.Check
-                      type="radio"
-                      name="firstName"
-                      label="Brand Accuracy"
-                      className="height1 custom-checkbox mb-3"
-                      checked={selectedOption === "Brand Accuracy"}
-                    />
+
+                  <Form.Group as={Col} md="12">
+                    <Row>
+                      <ul class="nav brand-tabs">
+                        <Col md="2">
+                          <li>
+                            <a
+                              class={
+                                selectedOptionShow === "Company/Brand"
+                                  ? "active"
+                                  : ""
+                              }
+                              data-toggle="tab"
+                              href="#tab3"
+                              onClick={() =>
+                                handleRadioSectionShow("Company/Brand")
+                              }
+                            >
+                              <span></span> Company/Brand
+                            </a>
+                          </li>
+                        </Col>
+                        <Col md="2">
+                          <li>
+                            <a
+                              class={
+                                selectedOptionShow === "Product" ? "active" : ""
+                              }
+                              data-toggle="tab"
+                              href="#tab4"
+                              onClick={() => handleRadioSectionShow("Product")}
+                            >
+                              <span></span> Product
+                            </a>
+                          </li>
+                        </Col>
+                      </ul>
+                    </Row>
                   </Form.Group>
+
+                  {/*------------------ Company/Brand Section -----------------*/}
+
+                  {selectedOptionShow === "Company/Brand" && (
+                    <>
+                      <Form.Group as={Col} md="4">
+                        <Form.Control
+                          type="text"
+                          name="firstName"
+                          placeholder="Company/Brand"
+                          className="height0 custom-placeholder mb-3"
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleRadioSelection("Brand Representation")
+                        }
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Brand Representation"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Brand Representation"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleRadioSelection("Brand Favorability")
+                        }
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Brand Favorability"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Brand Favorability"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() => handleRadioSelection("Brand Reach")}
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Brand Reach"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Brand Reach"}
+                        />
+                      </Form.Group>
+                    </>
+                  )}
+                  {/*------------------ Company/Brand Section -----------------*/}
+
+                  {/*-------------------------- Product -----------------------*/}
+                  {selectedOptionShow === "Product" && (
+                    <>
+                      <Form.Group as={Col} md="4">
+                        <Form.Control
+                          type="text"
+                          name="firstName"
+                          placeholder="Product"
+                          className="height0 custom-placeholder mb-3"
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleRadioSelection("Product Representation")
+                        }
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Product Representation"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Product Representation"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleRadioSelection("Product Favorability")
+                        }
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Product Favorability"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Product Favorability"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() => handleRadioSelection("Product Reach")}
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Product Reach"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Product Reach"}
+                        />
+                      </Form.Group>
+                    </>
+                  )}
+                  {/*------------------------- Product ------------------------*/}
+
                   <Form.Group
                     as={Col}
-                    md="6"
-                    className="cursor-pointer"
-                    onClick={() => handleRadioSelection("Brand Favorability")}
-                  >
-                    <Form.Check
-                      type="radio"
-                      name="firstName"
-                      label="Brand Favorability"
-                      className="height1 custom-checkbox mb-3"
-                      checked={selectedOption === "Brand Favorability"}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    md="6"
-                    className="cursor-pointer"
-                    onClick={() => handleRadioSelection("Brand Reach")}
-                  >
-                    <Form.Check
-                      type="radio"
-                      name="firstName"
-                      label="Brand Reach"
-                      className="height1 custom-checkbox mb-3"
-                      checked={selectedOption === "Brand Reach"}
-                    />
-                  </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    md="6"
+                    md="4"
                     className="cursor-pointer"
                     onClick={() => handleRadioSelection("Competition")}
                   >
@@ -238,40 +372,56 @@ function MainPage() {
                     />
                   </Form.Group>
 
-                  {selectedOption === "Brand Accuracy" && (
+                  <Form.Group
+                    as={Col}
+                    md="4"
+                    className="cursor-pointer"
+                    onClick={() =>
+                      handleRadioSelection("Hallucinations Identification")
+                    }
+                  >
+                    <Form.Check
+                      type="radio"
+                      name="firstName"
+                      label="Hallucinations Identification"
+                      className="height1 custom-checkbox mb-3"
+                      checked={
+                        selectedOption === "Hallucinations Identification"
+                      }
+                    />
+                  </Form.Group>
+
+                  {selectedOption === "Brand Representation" && (
                     <Container className="mb-3">
                       <Card as={Col} md="12" className="border-0 whi">
                         <Card.Body>
-                          <Card.Title className="">Brand Accuracy</Card.Title>
-                          <Card.Text>
+                          <Card.Title className="">
+                            Brand Representation
+                          </Card.Title>
+                          <Card.Text className="mt-4">
                             What dimensions do you want to focus on (choose all
                             that apply)
                           </Card.Text>
                           <ul class="focus-on">
                             <li>
                               <input type="checkbox" name="" value="" /> Brand
-                              Description
+                              Attributes
                             </li>
                             <li>
                               <input type="checkbox" name="" value="" /> Brand
-                              Logo
+                              Image and Logo's
                             </li>
                             <li>
                               <input type="checkbox" name="" value="" /> Product
-                              Portfolio
+                              Representation
                             </li>
                             <ul>
                               <li>Product Description</li>
-                              <li>Price</li>
-                              <li>Retail Distribution</li>
+                              <li>Product Image and Logo's</li>
+                              <li>Product Pricing</li>
+                              <li>Product Retailers</li>
+                              <li>Sources</li>
                             </ul>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Cited
-                              Sources
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Other
-                            </li>
                           </ul>
                           <small>
                             Note: interactive bot would ask what the user would
@@ -287,35 +437,22 @@ function MainPage() {
                     <Container className="mb-3">
                       <Card as={Col} md="12" className="border-0 whi">
                         <Card.Body>
-                          <Card.Title className="">
-                            Brand Favorability
-                          </Card.Title>
-                          <Card.Text>
+                          <Card.Title>Brand Favorability</Card.Title>
+                          <Card.Text className="mt-4">
                             What dimensions do you want to focus on (choose all
                             that apply)
                           </Card.Text>
                           <ul class="focus-on">
-                            <li>
-                              <input type="checkbox" name="" value="" /> Brand
-                              Strengths and Weaknesses (pros and cons?)
-                            </li>
                             <li>
                               <input type="checkbox" name="" value="" /> Top 5
                               Positive and Negative Attributes
                             </li>
                             <li>
                               <input type="checkbox" name="" value="" />{" "}
-                              Comparison to other competitors
+                              Competitor Comparison
                             </li>
-                            <ul>
-                              <li>Query which competitors</li>
-                            </ul>
                             <li>
                               <input type="checkbox" name="" value="" /> Source
-                              ID
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Other
                             </li>
                           </ul>
                           <small>
@@ -333,28 +470,70 @@ function MainPage() {
                       <Card as={Col} md="12" className="border-0 whi">
                         <Card.Body>
                           <Card.Title className="">Brand Reach</Card.Title>
-                          {/* <Card.Text>
-                          What dimensions do you want to focus on (choose all
-                          that apply)
-                        </Card.Text> */}
-                          <ul class="focus-on">
-                            <li>
-                              <input type="checkbox" name="" value="" /> Query
-                              top 3 prompts related to my brand
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> For
-                              these queries, reporting shows:
-                            </li>
-                            <ul>
-                              <li>Mention rate</li>
-                              <li>Sources</li>
-                              <li>Ranking within the query</li>
+                          <Card.Text>
+                            <ul class="nav brand-tabs">
+                              <li>
+                                <a
+                                  class={
+                                    selectedDotShow === "Input key Prompt"
+                                      ? "active"
+                                      : ""
+                                  }
+                                  data-toggle="tab"
+                                  href="#tab3"
+                                  onClick={() =>
+                                    handleDotShow("Input key Prompt")
+                                  }
+                                >
+                                  <span></span> Input key Prompt
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  class={
+                                    selectedDotShow === "Generate top 3 Prompt"
+                                      ? "active"
+                                      : ""
+                                  }
+                                  data-toggle="tab"
+                                  href="#tab3"
+                                  onClick={() =>
+                                    handleDotShow("Generate top 3 Prompt")
+                                  }
+                                >
+                                  <span></span> Generate top 3 Prompt
+                                </a>
+                              </li>
                             </ul>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Other
-                            </li>
-                          </ul>
+                          </Card.Text>
+                          {selectedDotShow === "Input key Prompt" && (
+                            <ul class="focus-on">
+                              <li>
+                                <input type="checkbox" name="" value="" />{" "}
+                                Mention Rate and Ranking
+                              </li>
+                              <li>
+                                <input type="checkbox" name="" value="" />{" "}
+                                Competitive Set
+                              </li>
+                              <li>
+                                <input type="checkbox" name="" value="" />{" "}
+                                Sources for Brand Info
+                              </li>
+                              <li>
+                                <input type="checkbox" name="" value="" />{" "}
+                                Sources for overall Info
+                              </li>
+                            </ul>
+                          )}
+                          {selectedDotShow === "Generate top 3 Prompt" && (
+                            <ul class="focus-on">
+                              <li>
+                                <input type="checkbox" name="" value="" /> Brand
+                                Attribute
+                              </li>
+                            </ul>
+                          )}
                           <small>
                             Prompt or up to 3 prompts are writtent based on
                             prompt feedback. Also could be a possibility of bot
@@ -374,24 +553,28 @@ function MainPage() {
                           What dimensions do you want to focus on (choose all
                           that apply)
                         </Card.Text> */}
-                          <ul class="focus-on">
+                          <ul class="focus-on mt-4">
                             <li>
-                              <input type="checkbox" name="" value="" /> Query
-                              Competitive Set
+                              <input type="checkbox" name="" value="" /> Input
+                              Competitive (up to 3)
                             </li>
                             <li>
-                              <input type="checkbox" name="" value="" /> Which
-                              Dimensions are of interest for competitive set
-                              compared to brand
+                              <input type="checkbox" name="" value="" /> What
+                              Dimensions Would You Like to Focus On?
                             </li>
                             <ul>
-                              <li>Query Brand Accuracy</li>
-                              <li>Query Brand Favorability</li>
-                              <li>Cite Sources</li>
+                              <li>Brand Representation Comparison</li>
+                              <li>Brand Favorability Comparison</li>
+                              <li>Brand Reach Comparison</li>
                             </ul>
                             <li>
-                              <input type="checkbox" name="" value="" /> Other
+                              <input type="checkbox" name="" value="" /> Input
+                              key Prompt
                             </li>
+                            <ul>
+                              <li>Mention Rate Making Comparison</li>
+                              <li>Brand Attribute Comparison</li>
+                            </ul>
                           </ul>
                           {/* <small>
                           Note: interactive bot would ask what the user would
@@ -402,9 +585,36 @@ function MainPage() {
                       </Card>
                     </Container>
                   )}
-                  <Form.Group as={Col} md="10">
+
+                  {selectedOption === "Hallucinations Identification" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="mb-4">
+                            Hallucinations Identification
+                          </Card.Title>
+                          {/* <Card.Text>
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </Card.Text> */}
+                          <ul class="focus-on">
+                            <li>
+                              <input type="checkbox" name="" value="" /> Input
+                              Competitive (up to 3)
+                            </li>
+                            <li>
+                              <input type="checkbox" name="" value="" /> What
+                              Dimensions Would You Like to Focus On?
+                            </li>
+                          </ul>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
+
+                  <Form.Group as={Col} md="12">
                     <Row>
-                      <Col md="7">
+                      <Col md="4">
                         <Dropdown className="dropdownllms">
                           <Dropdown.Toggle
                             variant="default"
