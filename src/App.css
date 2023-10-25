@@ -110,7 +110,7 @@ input.form-check-input {
 
 ul.nav.brand-tabs {
   position: relative;
-  margin: 15px 0 20px 0;
+  margin: 15px 0 20px 14px;
 }
 
 ul.nav.brand-tabs li {
@@ -156,7 +156,7 @@ ul.nav.brand-tabs a {
 
 .dropdown-toggle::after {
   display: inline-block;
-  margin-left: 4.255em !important;
+  margin-left: 9.855em !important;
   vertical-align: 0.255em;
   content: "";
   border-top: 0.3em solid;
@@ -168,7 +168,7 @@ ul.nav.brand-tabs a {
 
 @media screen and (max-width: 420px) {
   .dropdown-toggle::after {
-    margin-left: 1px !important;
+    margin-left: 90px !important;
   }
 /* 
   body {
@@ -230,7 +230,7 @@ button:focus:not(:focus-visible) {
 
 .custom-checkbox .form-check-input:checked {
   background-color: #3dc863 !important;
-  border-color: none !important;
+  border-color: #3dc863 !important;
   border-radius: 15px !important;
 }
 .form-check-input:focus {
@@ -804,4 +804,8 @@ p {
 .Icon svg {
   height: auto;
   width: 100%;
+}
+
+.Messages { 
+  color: #ccc !important;
 }

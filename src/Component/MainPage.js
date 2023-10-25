@@ -18,6 +18,8 @@ function MainPage() {
   const [selectedOptionShow, setSelectedOptionShow] = useState("Company/Brand");
   const [selectedDotShow, setSelectedDotShow] = useState("Input key Prompt");
   const [showData, setShowData] = useState(false);
+   const [messages, setMessages] = useState([]);
+   const [inputValue, setInputValue] = useState("");
   //--------------------------------------Select Data-------------------------------------//
   const options = ["GPT4", "GPT4/Bing", "SGE", "BARD", "Llama"];
   const [selectedCount, setSelectedCount] = useState(0);
@@ -111,6 +113,26 @@ function MainPage() {
     backgroundImage: "none",
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newMessage = inputValue.trim();
+
+    if (newMessage) {
+      setMessages([...messages, { text: newMessage, sender: "user" }]);
+      setInputValue("");
+
+      setTimeout(() => {
+        setMessages([...messages, { text: "Sample response", sender: "bot" }]);
+      }, 1000);
+    }
+  };
+
+  const messageList = messages.map((message, index) => (
+    <div key={index} className={`Message ${message.sender}`}>
+      {message.text}
+    </div>
+  ));
+
   return (
     <div className="">
       <Navbar className="bg-white p-2 mb-5">
@@ -130,7 +152,7 @@ function MainPage() {
             </span>
           </Navbar.Brand>
           <Navbar.Brand className="d-flex flex-1 d-block d-md-none">
-            <a href="#" className="sidebar-toggle ml-3">
+            <a href="" className="sidebar-toggle ml-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -167,10 +189,10 @@ function MainPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <Dropdown.Menu className="mt-4">
-                <Dropdown.Item href="#action/1">My Profile</Dropdown.Item>
-                <Dropdown.Item href="#action/2">Settings</Dropdown.Item>
+                <Dropdown.Item href="">My Profile</Dropdown.Item>
+                <Dropdown.Item href="">Settings</Dropdown.Item>
                 <hr className="mt-2 mb-2" />
-                <Dropdown.Item href="#action/2" className="text-danger">
+                <Dropdown.Item href="" className="text-danger">
                   Sign out
                 </Dropdown.Item>
               </Dropdown.Menu>
@@ -193,15 +215,13 @@ function MainPage() {
                     <Row>
                       <ul class="nav brand-tabs">
                         <Col md="2">
-                          <li>
+                          <li style={{ cursor: "pointer" }}>
                             <a
-                              class={
+                              className={`nav-link ${
                                 selectedOptionShow === "Company/Brand"
-                                  ? "active"
+                                  ? "active cursor-pointer"
                                   : ""
-                              }
-                              data-toggle="tab"
-                              href="#tab3"
+                              }`}
                               onClick={() =>
                                 handleRadioSectionShow("Company/Brand")
                               }
@@ -211,13 +231,13 @@ function MainPage() {
                           </li>
                         </Col>
                         <Col md="2">
-                          <li>
+                          <li style={{ cursor: "pointer" }}>
                             <a
-                              class={
-                                selectedOptionShow === "Product" ? "active" : ""
-                              }
-                              data-toggle="tab"
-                              href="#tab4"
+                              className={`nav-link ${
+                                selectedOptionShow === "Product"
+                                  ? "active cursor-pointer"
+                                  : ""
+                              }`}
                               onClick={() => handleRadioSectionShow("Product")}
                             >
                               <span></span> Product
@@ -225,6 +245,31 @@ function MainPage() {
                           </li>
                         </Col>
                       </ul>
+
+                      {/* <Col md="2">
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Company/Brand"
+                          className="mb-4 custom-radio"
+                          style={dataStyle}
+                          onClick={() =>
+                            handleRadioSectionShow("Company/Brand")
+                          }
+                          checked={selectedOptionShow === "Company/Brand"}
+                        />
+                      </Col>
+                      <Col md="2">
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Product"
+                          className="mb-4 custom-radio"
+                          style={dataStyle}
+                          onClick={() => handleRadioSectionShow("Product")}
+                          checked={selectedOptionShow === "Product"}
+                        />
+                      </Col> */}
                     </Row>
                   </Form.Group>
 
@@ -236,7 +281,7 @@ function MainPage() {
                         <Form.Control
                           type="text"
                           name="firstName"
-                          placeholder="Company/Brand"
+                          placeholder="Company/Brand (input)"
                           className="height0 custom-placeholder mb-3"
                         />
                       </Form.Group>
@@ -300,7 +345,7 @@ function MainPage() {
                         <Form.Control
                           type="text"
                           name="firstName"
-                          placeholder="Product"
+                          placeholder="Product (input)"
                           className="height0 custom-placeholder mb-3"
                         />
                       </Form.Group>
@@ -480,9 +525,11 @@ function MainPage() {
                                       : ""
                                   }
                                   data-toggle="tab"
-                                  href="#tab3"
-                                  onClick={() =>
-                                    handleDotShow("Input key Prompt")
+                                  href=""
+                                  onClick={(e) =>{
+                                    e.preventDefault();
+                                    handleDotShow("Input key Prompt");
+                                  }
                                   }
                                 >
                                   <span></span> Input key Prompt
@@ -496,10 +543,11 @@ function MainPage() {
                                       : ""
                                   }
                                   data-toggle="tab"
-                                  href="#tab3"
-                                  onClick={() =>
-                                    handleDotShow("Generate top 3 Prompt")
-                                  }
+                                  href=""
+                                  onClick={(e) =>{  
+                                    e.preventDefault();
+                                    handleDotShow("Generate top 3 Prompt");
+                                  }}
                                 >
                                   <span></span> Generate top 3 Prompt
                                 </a>
@@ -621,9 +669,16 @@ function MainPage() {
                             id="dropdown-basic"
                           >
                             <span className="dropdown-text lucnhbtn">
-                              {" "}
-                              Select LLM<span>s</span> ({selectedCount}{" "}
-                              Selected)
+                              {selectedCount ? (
+                                <>
+                                  {" "}
+                                  ({selectedCount})<span>Selected </span>{" "}
+                                </>
+                              ) : (
+                                <>
+                                  Select LLM<span>s</span>
+                                </>
+                              )}
                             </span>
                           </Dropdown.Toggle>
                           <Dropdown.Menu
@@ -1226,15 +1281,17 @@ function MainPage() {
                     </ul>
                   </div>
                   <div className="Messages">
-                    <div className="Messages_list"></div>
+                    <div className="Messages_list">{messageList}</div>
                   </div>
-                  <form id="messenger">
+                  <form id="messenger" onSubmit={handleSubmit}>
                     <div className="Input Input-blank">
                       {/* <!-- 	<textarea name="msg" className="Input_field" placeholder="Send a message..."></textarea> --> */}
                       <input
                         name="msg"
                         className="Input_field"
                         placeholder="What Would You Like to Focus On?"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                       />
                       <button
                         type="submit"
