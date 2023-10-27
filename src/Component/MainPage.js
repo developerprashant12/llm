@@ -10,6 +10,10 @@ import {
   Card,
   Dropdown,
 } from "react-bootstrap";
+import {
+  NotificationContainer,
+  NotificationManager,
+} from "react-notifications";
 
 function MainPage() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -18,36 +22,66 @@ function MainPage() {
   const [selectedOptionShow, setSelectedOptionShow] = useState("Company/Brand");
   const [selectedDotShow, setSelectedDotShow] = useState("Input key Prompt");
   const [showData, setShowData] = useState(false);
-   const [messages, setMessages] = useState([]);
-   const [inputValue, setInputValue] = useState("");
+  const [showGetData, setShowGetData] = useState(false);
+  const [showCheckBoxData, setShowCheckBoxData] = useState(false);
+  const [dataItem, setDataItem] = useState(" ");
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+
+  //----------------------------------Dynamic  Data for API-------------------------------//
+  const [promptData, setPromptData] = useState("");
+  const [checkedItems, setCheckedItems] = useState([]);
+  //----------------------------------Dynamic  Data for API-------------------------------//
+
   //--------------------------------------Select Data-------------------------------------//
-  const options = ["GPT4", "GPT4/Bing", "SGE", "BARD", "Llama"];
+  const options = [
+    "gpt_4",
+    "palm2_chat",
+    "llama2_70b_chat",
+    // "GPT4/Bing",
+    // "SGE",
+    // "Claude",
+  ];
   const [selectedCount, setSelectedCount] = useState(0);
   const [selectedItems, setSelectedItems] = useState({});
+  const [againselectedItems, setAgainSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  const handleCheckboxChange = (label, isChecked) => {
+  const handleCheckChange = (label, isChecked) => {
     const updatedSelectedItems = { ...selectedItems, [label]: isChecked };
     setSelectedItems(updatedSelectedItems);
-
     const newSelectedCount =
       Object.values(updatedSelectedItems).filter(Boolean).length;
     setSelectedCount(newSelectedCount);
+
+    // array form
+    const selectedKeysArray = Object.keys(updatedSelectedItems);
+    setAgainSelectedItems(selectedKeysArray);
   };
 
   const handleSelectAllChange = (event) => {
     const isChecked = event.target.checked;
     setSelectAll(isChecked);
 
-    const updatedSelectedItems = {};
+    const updatedSelectedItems = [];
     options.forEach((option) => {
       updatedSelectedItems[option] = isChecked;
     });
-
     setSelectedItems(updatedSelectedItems);
     setSelectedCount(isChecked ? options.length : 0);
   };
   //--------------------------------------Select Data-------------------------------------//
+
+  //----------------------------------Dynamic  Data for API-------------------------------//
+  const handleCheckBoxChange = (section, key) => {
+    if (checkedItems.includes(key)) {
+      setCheckedItems(checkedItems.filter((item) => item !== key));
+    } else {
+      setCheckedItems([...checkedItems, key]);
+    }
+  };
+
+  //---------------------------------Dynamic  Data for API--------------------------------//
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -78,17 +112,16 @@ function MainPage() {
   };
 
   const toggleChat = () => {
-    console.log("hii");
     setIsChatVisible(true);
   };
 
   const closeChat = () => {
-    console.log("hello");
     setIsChatVisible(false);
   };
 
   const handleRadioSelection = (option) => {
     setSelectedOption(option);
+    setCheckedItems([]);
   };
 
   const handleRadioSectionShow = (option) => {
@@ -101,16 +134,57 @@ function MainPage() {
 
   const handleClickShow = () => {
     setShowData(true);
+    const payload = {
+      input_prompt: promptData,
+      selected_models: againselectedItems,
+      avoid_repetition: false,
+      num_outputs: 1,
+      quality: 1,
+      max_tokens: 500,
+      sampling_temperature: 0.7,
+      variables: null,
+      documents: checkedItems,
+    };
+    fetch("https://api.gooey.ai/v2/CompareLLM/", {
+      method: "POST",
+      headers: {
+        Authorization:
+          "Bearer sk-pWN2faBeuEHUlIduApEb1lxUH5c0k3PnX7OkHtM9wtUUHS5A",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setShowData(false);
+          setShowGetData(true);
+          setDataItem(data.output.output_text);
+        }
+      })
+      .catch((error) => {
+        NotificationManager.error(
+          "Doh! You need to purchase additional credits to run more Gooey.AI recipes: https://gooey.ai/account",
+          "",
+          3000
+        );
+        console.log(error);
+      });
   };
 
   const handleClickReset = () => {
-    setShowData(false);
+    console.log("first");
+    setShowGetData(false);
   };
 
   const dataStyle = {
     paddingLeft: "0px",
     fontSize: "17px",
     backgroundImage: "none",
+  };
+
+  const handleCheckBoxData = (event) => {
+    setShowCheckBoxData(event.target.checked);
   };
 
   const handleSubmit = (e) => {
@@ -245,31 +319,6 @@ function MainPage() {
                           </li>
                         </Col>
                       </ul>
-
-                      {/* <Col md="2">
-                        <Form.Check
-                          type="radio"
-                          name="firstName"
-                          label="Company/Brand"
-                          className="mb-4 custom-radio"
-                          style={dataStyle}
-                          onClick={() =>
-                            handleRadioSectionShow("Company/Brand")
-                          }
-                          checked={selectedOptionShow === "Company/Brand"}
-                        />
-                      </Col>
-                      <Col md="2">
-                        <Form.Check
-                          type="radio"
-                          name="firstName"
-                          label="Product"
-                          className="mb-4 custom-radio"
-                          style={dataStyle}
-                          onClick={() => handleRadioSectionShow("Product")}
-                          checked={selectedOptionShow === "Product"}
-                        />
-                      </Col> */}
                     </Row>
                   </Form.Group>
 
@@ -283,6 +332,7 @@ function MainPage() {
                           name="firstName"
                           placeholder="Company/Brand (input)"
                           className="height0 custom-placeholder mb-3"
+                          onChange={(e) => setPromptData(e.target.value)}
                         />
                       </Form.Group>
 
@@ -347,6 +397,7 @@ function MainPage() {
                           name="firstName"
                           placeholder="Product (input)"
                           className="height0 custom-placeholder mb-3"
+                          onChange={(e) => setPromptData(e.target.value)}
                         />
                       </Form.Group>
 
@@ -448,25 +499,28 @@ function MainPage() {
                             that apply)
                           </Card.Text>
                           <ul class="focus-on">
-                            <li>
-                              <input type="checkbox" name="" value="" /> Brand
-                              Attributes
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Brand
-                              Image and Logo's
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Product
-                              Representation
-                            </li>
-                            <ul>
-                              <li>Product Description</li>
-                              <li>Product Image and Logo's</li>
-                              <li>Product Pricing</li>
-                              <li>Product Retailers</li>
-                              <li>Sources</li>
-                            </ul>
+                            {[
+                              "Brand Description",
+                              "Brand Attributes",
+                              "Brand Image Logos",
+                              "Sources",
+                            ].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange(
+                                      "brandRepresentation",
+                                      key
+                                    )
+                                  }
+                                />{" "}
+                                {key}
+                              </li>
+                            ))}
                           </ul>
                           <small>
                             Note: interactive bot would ask what the user would
@@ -488,17 +542,27 @@ function MainPage() {
                             that apply)
                           </Card.Text>
                           <ul class="focus-on">
-                            <li>
-                              <input type="checkbox" name="" value="" /> Top 5
-                              Positive and Negative Attributes
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" />{" "}
-                              Competitor Comparison
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Source
-                            </li>
+                            {[
+                              "Top 5 Positive and Negative Attributes",
+                              "Competitor Comparison",
+                              "Sources",
+                            ].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange(
+                                      "brandRepresentation",
+                                      key
+                                    )
+                                  }
+                                />{" "}
+                                {key}
+                              </li>
+                            ))}
                           </ul>
                           <small>
                             Note: interactive bot would ask what the user would
@@ -526,11 +590,10 @@ function MainPage() {
                                   }
                                   data-toggle="tab"
                                   href=""
-                                  onClick={(e) =>{
+                                  onClick={(e) => {
                                     e.preventDefault();
                                     handleDotShow("Input key Prompt");
-                                  }
-                                  }
+                                  }}
                                 >
                                   <span></span> Input key Prompt
                                 </a>
@@ -544,7 +607,7 @@ function MainPage() {
                                   }
                                   data-toggle="tab"
                                   href=""
-                                  onClick={(e) =>{  
+                                  onClick={(e) => {
                                     e.preventDefault();
                                     handleDotShow("Generate top 3 Prompt");
                                   }}
@@ -556,30 +619,246 @@ function MainPage() {
                           </Card.Text>
                           {selectedDotShow === "Input key Prompt" && (
                             <ul class="focus-on">
-                              <li>
-                                <input type="checkbox" name="" value="" />{" "}
-                                Mention Rate and Ranking
-                              </li>
-                              <li>
-                                <input type="checkbox" name="" value="" />{" "}
-                                Competitive Set
-                              </li>
-                              <li>
-                                <input type="checkbox" name="" value="" />{" "}
-                                Sources for Brand Info
-                              </li>
-                              <li>
-                                <input type="checkbox" name="" value="" />{" "}
-                                Sources for overall Info
-                              </li>
+                              {[
+                                "Mention Rate and Ranking",
+                                "Competitive Set",
+                                "Sources for Brand Info",
+                                "Sources for overall Info",
+                              ].map((key) => (
+                                <li key={key}>
+                                  <input
+                                    type="checkbox"
+                                    name=""
+                                    value=""
+                                    checked={checkedItems.includes(key)}
+                                    onChange={() =>
+                                      handleCheckBoxChange(
+                                        "brandRepresentation",
+                                        key
+                                      )
+                                    }
+                                  />{" "}
+                                  {key}
+                                </li>
+                              ))}
                             </ul>
                           )}
                           {selectedDotShow === "Generate top 3 Prompt" && (
                             <ul class="focus-on">
-                              <li>
-                                <input type="checkbox" name="" value="" /> Brand
-                                Attribute
+                              {[
+                                "Mention Rate and Ranking",
+                                "Competitive Set",
+                                "Sources for Brand Info",
+                                "Sources for overall Info",
+                              ].map((key) => (
+                                <li key={key}>
+                                  <input
+                                    type="checkbox"
+                                    name=""
+                                    value=""
+                                    checked={checkedItems.includes(key)}
+                                    onChange={() =>
+                                      handleCheckBoxChange(
+                                        "brandRepresentation",
+                                        key
+                                      )
+                                    }
+                                  />{" "}
+                                  {key}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <small>
+                            Prompt or up to 3 prompts are writtent based on
+                            prompt feedback. Also could be a possibility of bot
+                            to recommend prompts.
+                          </small>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
+
+                  {selectedOption === "Product Representation" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="">
+                            Product Representation
+                          </Card.Title>
+                          <Card.Text className="mt-4">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </Card.Text>
+                          <ul class="focus-on">
+                            {[
+                              "Brand Description",
+                              "Brand Attributes",
+                              "Brand Image Logos",
+                              "Sources",
+                            ].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange(
+                                      "brandRepresentation",
+                                      key
+                                    )
+                                  }
+                                />{" "}
+                                {key}
                               </li>
+                            ))}
+                          </ul>
+                          <small>
+                            Note: interactive bot would ask what the user would
+                            like to focus on. Prompt is written based on this
+                            feedback
+                          </small>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
+
+                  {selectedOption === "Product Favorability" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title>Product Favorability</Card.Title>
+                          <Card.Text className="mt-4">
+                            What dimensions do you want to focus on (choose all
+                            that apply)
+                          </Card.Text>
+                          <ul class="focus-on">
+                            {[
+                              "Top 5 Positive and Negative Attributes",
+                              "Competitor Comparison",
+                              "Sources",
+                            ].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange(
+                                      "brandRepresentation",
+                                      key
+                                    )
+                                  }
+                                />{" "}
+                                {key}
+                              </li>
+                            ))}
+                          </ul>
+                          <small>
+                            Note: interactive bot would ask what the user would
+                            like to focus on. Prompt is written based on this
+                            feedback
+                          </small>
+                        </Card.Body>
+                      </Card>
+                    </Container>
+                  )}
+
+                  {selectedOption === "Product Reach" && (
+                    <Container className="mb-3">
+                      <Card as={Col} md="12" className="border-0 whi">
+                        <Card.Body>
+                          <Card.Title className="">Product Reach</Card.Title>
+                          <Card.Text>
+                            <ul class="nav brand-tabs">
+                              <li>
+                                <a
+                                  class={
+                                    selectedDotShow === "Input key Prompt"
+                                      ? "active"
+                                      : ""
+                                  }
+                                  data-toggle="tab"
+                                  href=""
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleDotShow("Input key Prompt");
+                                  }}
+                                >
+                                  <span></span> Input key Prompt
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  class={
+                                    selectedDotShow === "Generate top 3 Prompt"
+                                      ? "active"
+                                      : ""
+                                  }
+                                  data-toggle="tab"
+                                  href=""
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleDotShow("Generate top 3 Prompt");
+                                  }}
+                                >
+                                  <span></span> Generate top 3 Prompt
+                                </a>
+                              </li>
+                            </ul>
+                          </Card.Text>
+                          {selectedDotShow === "Input key Prompt" && (
+                            <ul class="focus-on">
+                              {[
+                                "Mention Rate and Ranking",
+                                "Competitive Set",
+                                "Sources for Brand Info",
+                                "Sources for overall Info",
+                              ].map((key) => (
+                                <li key={key}>
+                                  <input
+                                    type="checkbox"
+                                    name=""
+                                    value=""
+                                    checked={checkedItems.includes(key)}
+                                    onChange={() =>
+                                      handleCheckBoxChange(
+                                        "brandRepresentation",
+                                        key
+                                      )
+                                    }
+                                  />{" "}
+                                  {key}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {selectedDotShow === "Generate top 3 Prompt" && (
+                            <ul class="focus-on">
+                              {[
+                                "Mention Rate and Ranking",
+                                "Competitive Set",
+                                "Sources for Brand Info",
+                                "Sources for overall Info",
+                              ].map((key) => (
+                                <li key={key}>
+                                  <input
+                                    type="checkbox"
+                                    name=""
+                                    value=""
+                                    checked={checkedItems.includes(key)}
+                                    onChange={() =>
+                                      handleCheckBoxChange(
+                                        "brandRepresentation",
+                                        key
+                                      )
+                                    }
+                                  />{" "}
+                                  {key}
+                                </li>
+                              ))}
                             </ul>
                           )}
                           <small>
@@ -597,38 +876,130 @@ function MainPage() {
                       <Card as={Col} md="12" className="border-0 whi">
                         <Card.Body>
                           <Card.Title className="">Competition</Card.Title>
-                          {/* <Card.Text>
-                          What dimensions do you want to focus on (choose all
-                          that apply)
-                        </Card.Text> */}
                           <ul class="focus-on mt-4">
-                            <li>
-                              <input type="checkbox" name="" value="" /> Input
-                              Competitive (up to 3)
+                            <li className="mb-3">
+                              <input
+                                type="checkbox"
+                                name=""
+                                value=""
+                                onChange={handleCheckBoxData}
+                              />{" "}
+                              Input Competitive (up to 3)
                             </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> What
-                              Dimensions Would You Like to Focus On?
-                            </li>
-                            <ul>
+
+                            {showCheckBoxData ? (
+                              <div class="compitorsbox productcompit">
+                                <span class="d-flex">
+                                  <input
+                                    type="text"
+                                    name="coupon_field"
+                                    placeholder="Competitor 1"
+                                    id="coupon_field"
+                                  />
+                                </span>
+                                <span class="d-flex">
+                                  <input
+                                    type="text"
+                                    name="coupon_field"
+                                    placeholder="Competitor 2"
+                                    id="coupon_field"
+                                  />
+                                </span>
+                                <span class="d-flex">
+                                  <input
+                                    type="text"
+                                    name="coupon_field"
+                                    placeholder="Competitor 3"
+                                    id="coupon_field"
+                                  />
+                                </span>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            <li>What Dimensions Would You Like to Focus On?</li>
+                            <ul
+                              style={{ listStyle: "none", paddingLeft: "18px" }}
+                            >
                               <li>Brand Representation Comparison</li>
+                              <ul
+                                style={{ listStyle: "none", padding: "0 20px" }}
+                              >
+                                {[
+                                  "Brand Description",
+                                  "Brand Attributes",
+                                  "Brand Image and Logos",
+                                  "Sources",
+                                ].map((key) => (
+                                  <li key={key}>
+                                    <input
+                                      type="checkbox"
+                                      name=""
+                                      value=""
+                                      checked={checkedItems.includes(key)}
+                                      onChange={() =>
+                                        handleCheckBoxChange(
+                                          "brandRepresentation",
+                                          key
+                                        )
+                                      }
+                                    />{" "}
+                                    {key}
+                                  </li>
+                                ))}
+                              </ul>
                               <li>Brand Favorability Comparison</li>
+                              <ul
+                                style={{ listStyle: "none", padding: "0 20px" }}
+                              >
+                                {[
+                                  "5 Positive and negative Attributes",
+                                  "Sources",
+                                ].map((key) => (
+                                  <li key={key}>
+                                    <input
+                                      type="checkbox"
+                                      name=""
+                                      value=""
+                                      checked={checkedItems.includes(key)}
+                                      onChange={() =>
+                                        handleCheckBoxChange(
+                                          "brandRepresentation",
+                                          key
+                                        )
+                                      }
+                                    />{" "}
+                                    {key}
+                                  </li>
+                                ))}
+                              </ul>
                               <li>Brand Reach Comparison</li>
-                            </ul>
-                            <li>
-                              <input type="checkbox" name="" value="" /> Input
-                              key Prompt
-                            </li>
-                            <ul>
-                              <li>Mention Rate Making Comparison</li>
-                              <li>Brand Attribute Comparison</li>
+                              <ul
+                                style={{ listStyle: "none", padding: "0 20px" }}
+                              >
+                                {["Mention Rate and Rankings", "Sources"].map(
+                                  (key) => (
+                                    <li key={key}>
+                                      <input
+                                        type="checkbox"
+                                        name=""
+                                        value=""
+                                        checked={checkedItems.includes(key)}
+                                        onChange={() =>
+                                          handleCheckBoxChange(
+                                            "brandRepresentation",
+                                            key
+                                          )
+                                        }
+                                      />{" "}
+                                      {key}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
                             </ul>
                           </ul>
-                          {/* <small>
-                          Note: interactive bot would ask what the user would
-                          like to focus on. Prompt is written based on this
-                          feedback
-                        </small> */}
                         </Card.Body>
                       </Card>
                     </Container>
@@ -641,19 +1012,31 @@ function MainPage() {
                           <Card.Title className="mb-4">
                             Hallucinations Identification
                           </Card.Title>
-                          {/* <Card.Text>
-                            What dimensions do you want to focus on (choose all
-                            that apply)
-                          </Card.Text> */}
+
                           <ul class="focus-on">
-                            <li>
-                              <input type="checkbox" name="" value="" /> Input
-                              Competitive (up to 3)
-                            </li>
-                            <li>
-                              <input type="checkbox" name="" value="" /> What
-                              Dimensions Would You Like to Focus On?
-                            </li>
+                            {[
+                              "Company Description",
+                              "Company Key Facts",
+                              "Brand Representation",
+                              "Brand Logos and Images",
+                              "Executive Bios",
+                            ].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange(
+                                      "brandRepresentation",
+                                      key
+                                    )
+                                  }
+                                />{" "}
+                                {key}
+                              </li>
+                            ))}
                           </ul>
                         </Card.Body>
                       </Card>
@@ -692,21 +1075,25 @@ function MainPage() {
                             <Form.Check
                               type="checkbox"
                               label="Select All"
-                              className="mb-2 text-xxl"
+                              className="mb-2 text-xxl data"
                               checked={selectAll}
                               onChange={handleSelectAllChange}
                             />
                             <Dropdown.Divider />
 
-                            {options.map((option) => (
+                            {options.map((option, index) => (
                               <Form.Check
                                 key={option}
                                 type="checkbox"
                                 label={option}
-                                className="mb-2"
+                                className={`mb-2 ${
+                                  index === options.length - 1
+                                    ? "gray-checkbox"
+                                    : ""
+                                } customData`}
                                 checked={selectedItems[option] || false}
                                 onChange={(event) =>
-                                  handleCheckboxChange(
+                                  handleCheckChange(
                                     option,
                                     event.target.checked
                                   )
@@ -728,8 +1115,9 @@ function MainPage() {
                             color: "white",
                           }}
                           onClick={handleClickShow}
+                          disabled={Object.keys(selectedItems).length === 0}
                         >
-                          LAUNCH
+                          {showData ? <>Please Wait...</> : <>LAUNCH</>}
                         </Button>
                       </Col>
 
@@ -755,7 +1143,7 @@ function MainPage() {
               </Form>
             </Container>
 
-            {showData ? (
+            {showGetData === true ? (
               <Row className="mt-5 mb-4">
                 <Col md="8">
                   <Card className="border border-secondary-subtle rounded-0">
@@ -764,190 +1152,37 @@ function MainPage() {
                     </Card.Header>
                     <Container className="mt-3">
                       <Card.Body>
-                        <div className="dboxcont">
-                          <nav className="card-header-actions">
-                            <a
-                              className="card-header-action"
-                              aria-expanded="false"
-                              aria-controls="card1"
-                              title="Copy"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <i className="fas fa-clipboard"></i>
-                            </a>
-                          </nav>
-                          <span className="brnd">GPT4</span>
-                          <h4 className="card-title">Brand Accuracy</h4>
-                          <p className="card-text">
-                            What dimensions do you want to focus on (choose all
-                            that apply)
-                          </p>
-                          <ul>
-                            <li>Brand Description</li>
-                            <li>Brand Logo</li>
-                            <li>Product Portfolio</li>
-                            <ul>
-                              <li>Product Description</li>
-                              <li>Price</li>
-                              <li>Retail Distribution</li>
-                            </ul>
-                            <li>Cited Sources</li>
-                            <li>Other</li>
-                          </ul>
-                          <small>
-                            <b>Note:</b> Interactive bot would ask what the user
-                            would like to focus on. Prompt is written based on
-                            this feedback
-                          </small>
-                        </div>
-                        <hr />
-                        <div className="dboxcont">
-                          <nav className="card-header-actions">
-                            <a
-                              className="card-header-action"
-                              aria-expanded="false"
-                              aria-controls="card1"
-                              title="Copy"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <i className="fas fa-clipboard"></i>
-                            </a>
-                          </nav>
-                          <span className="brnd">GPT4/Bing</span>
-                          <h4 className="card-title">Brand Accuracy</h4>
-                          <p className="card-text">
-                            What dimensions do you want to focus on (choose all
-                            that apply)
-                          </p>
-                          <ul>
-                            <li>Brand Description</li>
-                            <li>Brand Logo</li>
-                            <li>Product Portfolio</li>
-                            <ul>
-                              <li>Product Description</li>
-                              <li>Price</li>
-                              <li>Retail Distribution</li>
-                            </ul>
-                            <li>Cited Sources</li>
-                            <li>Other</li>
-                          </ul>
-                          <small>
-                            <b>Note:</b> Interactive bot would ask what the user
-                            would like to focus on. Prompt is written based on
-                            this feedback
-                          </small>
-                        </div>
-                        <hr />
-                        <div className="dboxcont">
-                          <nav className="card-header-actions">
-                            <a
-                              className="card-header-action"
-                              aria-expanded="false"
-                              aria-controls="card1"
-                              title="Copy"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <i className="fas fa-clipboard"></i>
-                            </a>
-                          </nav>
-                          <span className="brnd">SGE</span>
-                          <h4 className="card-title">Brand Accuracy</h4>
-                          <p className="card-text">
-                            What dimensions do you want to focus on (choose all
-                            that apply)
-                          </p>
-                          <ul>
-                            <li>Brand Description</li>
-                            <li>Brand Logo</li>
-                            <li>Product Portfolio</li>
-                            <ul>
-                              <li>Product Description</li>
-                              <li>Price</li>
-                              <li>Retail Distribution</li>
-                            </ul>
-                            <li>Cited Sources</li>
-                            <li>Other</li>
-                          </ul>
-                          <small>
-                            <b>Note:</b> Interactive bot would ask what the user
-                            would like to focus on. Prompt is written based on
-                            this feedback
-                          </small>
-                        </div>
-                        <hr />
-                        <div className="dboxcont">
-                          <nav className="card-header-actions">
-                            <a
-                              className="card-header-action"
-                              aria-expanded="false"
-                              aria-controls="card1"
-                              title="Copy"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <i className="fas fa-clipboard"></i>
-                            </a>
-                          </nav>
-                          <span className="brnd">BARD</span>
-                          <h4 className="card-title">Brand Accuracy</h4>
-                          <p className="card-text">
-                            What dimensions do you want to focus on (choose all
-                            that apply)
-                          </p>
-                          <ul>
-                            <li>Brand Description</li>
-                            <li>Brand Logo</li>
-                            <li>Product Portfolio</li>
-                            <ul>
-                              <li>Product Description</li>
-                              <li>Price</li>
-                              <li>Retail Distribution</li>
-                            </ul>
-                            <li>Cited Sources</li>
-                            <li>Other</li>
-                          </ul>
-                          <small>
-                            <b>Note:</b> Interactive bot would ask what the user
-                            would like to focus on. Prompt is written based on
-                            this feedback
-                          </small>
-                        </div>
-                        <hr />
-                        <div className="dboxcont">
-                          <nav className="card-header-actions">
-                            <a
-                              className="card-header-action"
-                              aria-expanded="false"
-                              aria-controls="card1"
-                              title="Copy"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <i className="fas fa-clipboard"></i>
-                            </a>
-                          </nav>
-                          <span className="brnd">LIama</span>
-                          <h4 className="card-title">Brand Accuracy</h4>
-                          <p className="card-text">
-                            What dimensions do you want to focus on (choose all
-                            that apply)
-                          </p>
-                          <ul>
-                            <li>Brand Description</li>
-                            <li>Brand Logo</li>
-                            <li>Product Portfolio</li>
-                            <ul>
-                              <li>Product Description</li>
-                              <li>Price</li>
-                              <li>Retail Distribution</li>
-                            </ul>
-                            <li>Cited Sources</li>
-                            <li>Other</li>
-                          </ul>
-                          <small>
-                            <b>Note:</b> Interactive bot would ask what the user
-                            would like to focus on. Prompt is written based on
-                            this feedback
-                          </small>
-                        </div>
+                        {Object.keys(dataItem).map((name) => (
+                          <>
+                            <div class="dboxcont" key={name}>
+                              <nav class="card-header-actions">
+                                <a
+                                  class="card-header-action"
+                                  aria-expanded="false"
+                                  aria-controls="card1"
+                                  title="Copy"
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <i class="fas fa-clipboard"></i>
+                                </a>
+                              </nav>
+                              <span class="brnd">{name}</span>
+                              <h4 class="card-title">{selectedOption}</h4>
+                              <p class="card-text">
+                                <b>
+                                  {selectedOptionShow === "Product" ? (
+                                    <>Product Description:</>
+                                  ) : (
+                                    <>Brand Description:</>
+                                  )}
+                                </b>
+                                <br />
+                                {dataItem[name]}
+                              </p>
+                            </div>
+                            <hr />
+                          </>
+                        ))}
                       </Card.Body>
                     </Container>
                   </Card>
@@ -1334,6 +1569,7 @@ function MainPage() {
           {/* Chat Message */}
         </div>
       </Container>
+      <NotificationContainer />
     </div>
   );
 }

@@ -225,7 +225,7 @@ button:focus:not(:focus-visible) {
 .form-check .form-check-input {
   float: left !important;
   margin-left: 0 !important;
-  border-radius: 15px !important;
+  /* border-radius: 15px !important; */
 }
 
 .custom-checkbox .form-check-input:checked {
@@ -257,8 +257,8 @@ label {
 }
 
 .dboxcont {
-  background: #000000ab;
-  padding: 10px 10px;
+  background: #000000cf;
+  padding: 20px 20px;
   position: relative;
   color: #fff;
 }
@@ -344,8 +344,8 @@ span.brnd {
   left: -38px;
 }
 
-.card-title {
-  margin-bottom: 20px;
+h4.card-title {
+  margin-bottom: 20px !important;
   font-weight: 400;
 }
 
@@ -808,4 +808,41 @@ p {
 
 .Messages { 
   color: #ccc !important;
+}
+
+hr {
+  border-top: solid 1px rgb(66, 66, 66);
+}
+
+.compitorsbox {
+  display: flex;
+    gap: 20px;
+    background: #cccccc5e;
+    width: 44%;
+    margin: 16px 0 16px 18px;
+    padding: 3px 10px;
+}
+
+.compitorsbox span {
+  display: flex;
+}
+
+.productcompit {
+  background: transparent;
+  margin: 16px 0 16px 10px;
+  flex-direction: column;
+}
+
+.gray-checkbox {
+  color: gray;
+}
+
+.customData {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.data label.form-check-label {
+  font-size: 16px;
+  font-weight: 600;
 }
