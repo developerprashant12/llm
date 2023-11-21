@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
+import Markdown from "markdown-to-jsx";
 import {
   Container,
   Navbar,
@@ -9,6 +10,8 @@ import {
   Button,
   Card,
   Dropdown,
+  Spinner,
+  Table,
 } from "react-bootstrap";
 import {
   NotificationContainer,
@@ -20,32 +23,48 @@ function MainPage() {
   const [isChatVisible, setIsChatVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOptionShow, setSelectedOptionShow] = useState("Company/Brand");
-  const [selectedDotShow, setSelectedDotShow] = useState("Input key Prompt");
+  const [selectedDotShow, setSelectedDotShow] = useState("Input key Prompt :");
   const [showData, setShowData] = useState(false);
   const [showGetData, setShowGetData] = useState(false);
   const [showCheckBoxData, setShowCheckBoxData] = useState(false);
-  const [dataItem, setDataItem] = useState(" ");
+  const [dataItem, setDataItem] = useState({});
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
-
+  const [competitors, setCompetitors] = useState([]);
+  const [promptBrandReach, setPromptBrandReach] = useState("");
   //----------------------------------Dynamic  Data for API-------------------------------//
   const [promptData, setPromptData] = useState("");
+  const [promptBrand, setPromptBrand] = useState("");
+  const [promptBrandKey, setPromptBrandKey] = useState("");
   const [checkedItems, setCheckedItems] = useState([]);
   //----------------------------------Dynamic  Data for API-------------------------------//
 
   //--------------------------------------Select Data-------------------------------------//
   const options = [
-    "gpt_4",
-    "palm2_chat",
-    "llama2_70b_chat",
-    // "GPT4/Bing",
-    // "SGE",
-    // "Claude",
+    { name: "GPT-4 (OpenAI)", value: "gpt_4" },
+    { name: "Palm2 (Google/Bard)", value: "palm2_chat" },
+    { name: "Llama2 (Meta)", value: "llama2_70b_chat" },
+    { name: "Claude (Anthropic)", value: "Claude" },
+    { name: "SGE (Google)", value: "SGE" },
+    { name: "Bing Chat (Microsoft)", value: "GPT4/Bing" },
   ];
+
   const [selectedCount, setSelectedCount] = useState(0);
   const [selectedItems, setSelectedItems] = useState({});
   const [againselectedItems, setAgainSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        alert("Text copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
 
   const handleCheckChange = (label, isChecked) => {
     const updatedSelectedItems = { ...selectedItems, [label]: isChecked };
@@ -54,22 +73,32 @@ function MainPage() {
       Object.values(updatedSelectedItems).filter(Boolean).length;
     setSelectedCount(newSelectedCount);
 
-    // array form
-    const selectedKeysArray = Object.keys(updatedSelectedItems);
+    // array form Data
+    const selectedKeysArray = Object.keys(updatedSelectedItems).filter(
+      (key) => updatedSelectedItems[key]
+    );
     setAgainSelectedItems(selectedKeysArray);
   };
 
   const handleSelectAllChange = (event) => {
-    const isChecked = event.target.checked;
-    setSelectAll(isChecked);
+    if (!event) {
+      const isChecked = event.target.checked;
+      setSelectAll(isChecked);
 
-    const updatedSelectedItems = [];
-    options.forEach((option) => {
-      updatedSelectedItems[option] = isChecked;
-    });
-    setSelectedItems(updatedSelectedItems);
-    setSelectedCount(isChecked ? options.length : 0);
+      const updatedSelectedItems = [];
+      options.forEach((option) => {
+        updatedSelectedItems[option.value] = isChecked;
+      });
+      setSelectedItems(updatedSelectedItems);
+      const selectedKeysArray = Object.keys(updatedSelectedItems).filter(
+        (key) => updatedSelectedItems[key]
+      );
+      setAgainSelectedItems(selectedKeysArray);
+
+      setSelectedCount(isChecked ? options.length : 0);
+    }
   };
+
   //--------------------------------------Select Data-------------------------------------//
 
   //----------------------------------Dynamic  Data for API-------------------------------//
@@ -80,7 +109,6 @@ function MainPage() {
       setCheckedItems([...checkedItems, key]);
     }
   };
-
   //---------------------------------Dynamic  Data for API--------------------------------//
 
   useEffect(() => {
@@ -122,59 +150,157 @@ function MainPage() {
   const handleRadioSelection = (option) => {
     setSelectedOption(option);
     setCheckedItems([]);
+    setShowCheckBoxData(false);
+    setCompetitors("");
+    setPromptBrandReach("");
   };
 
   const handleRadioSectionShow = (option) => {
     setSelectedOptionShow(option);
+    setSelectedOption(null);
+    setPromptData("");
+    setShowCheckBoxData(false);
+    setCompetitors('');
+    setPromptBrandReach("");
+    setAgainSelectedItems([])
+    setSelectedItems({})
+    setSelectedOption(null);
+    setSelectAll(false);
+    setSelectedCount(0);
+    setPromptBrandKey("");
   };
 
   const handleDotShow = (option) => {
+    setCheckedItems([]);
     setSelectedDotShow(option);
   };
 
   const handleClickShow = () => {
-    setShowData(true);
-    const payload = {
-      input_prompt: promptData,
-      selected_models: againselectedItems,
-      avoid_repetition: false,
-      num_outputs: 1,
-      quality: 1,
-      max_tokens: 500,
-      sampling_temperature: 0.7,
-      variables: null,
-      documents: checkedItems,
-    };
-    fetch("https://api.gooey.ai/v2/CompareLLM/", {
-      method: "POST",
-      headers: {
-        Authorization:
-          "Bearer sk-pWN2faBeuEHUlIduApEb1lxUH5c0k3PnX7OkHtM9wtUUHS5A",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data) {
-          setShowData(false);
-          setShowGetData(true);
-          setDataItem(data.output.output_text);
-        }
+    console.log("checkedItems", checkedItems);
+    if (
+      (promptData.length != 0 &&
+        checkedItems.length != 0 &&
+        againselectedItems != 0) ||
+      (promptBrandKey.length != 0)
+    ) {
+      setShowData(true);
+      setShowGetData(false);
+
+
+
+
+      const inputPrompt = `${
+        promptBrandKey.length !== 0
+          ? `${promptBrandKey}. Please Don't send me incomplete data and Please don't give me any wrong information in response.`
+          : `Please provide me specific data of ${promptData} with ${checkedItems}  ${
+              competitors.length !== 0 ? "and" + competitors + "competitor" : ""
+            } ${
+              promptBrandReach.length !== 0
+                ? "Prompt:" + "" + promptBrandReach
+                : ""
+            } of ${selectedOption}.and  Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
+            ${
+              selectedOption != "Competition"
+                ? `I don't want any data in the table in the response.`
+                : ""
+            }  ${
+              checkedItems.includes("Brand Image and Logos")
+                ? `If asked about Brand Image and logos, I just want this response in response."Model does not currently provide images and logos". I don't want anything else in response except this message.`
+                : ""
+            } ${
+              checkedItems.includes("Brand Attributes")
+                ? `If Brand Attributes data is provided, format the data in an unordered list with bullets.`
+                : ""
+            }
+            ${
+              selectedOption === "Competition"
+                ? `Create a border on the table that contains the following. Company name in the first column, ${competitors} and its related companies in the rows, company description in the second column. The top 5 positive attributes as the third column in that table, and the top 5 negative attributes as the fourth column in that table. Please list all features as concise bullet points.`
+                : ""
+            }
+            ${
+              checkedItems.includes("Competitive Set")
+                ? `If Competitive Set data is provided, format the data in an unordered list with bullets.`
+                : ""
+            } ${
+              checkedItems.includes("Sources")
+                ? `If asked about data related to Sources, only provide the message: 'Model does not provide accurate source information'. Apart from this message, I don't need anything else in response.`
+                : ""
+            } ${
+              checkedItems.includes("Product Image and Logos")
+                ? `If asked about Product Image and logos, I just want this response in response. I don't need anything else in response except the message: "Model does not currently provide images and logos".`
+                : ""
+            } ${
+              checkedItems.includes("Product Attributes")
+                ? `If Product Attributes data is provided, format the data in an unordered list with bullets.`
+                : ""
+            }`
+      }`.replace(/\s+/g, " ");
+
+
+
+
+      const payload = {
+        input_prompt: inputPrompt,
+        selected_models: againselectedItems,
+        avoid_repetition: false,
+        num_outputs: 1,
+        quality: 1,
+        max_tokens: 500,
+        sampling_temperature: 0.7,
+        variables: null,
+      };
+      console.log("payload", payload);
+      fetch("https://api.gooey.ai/v2/CompareLLM/", {
+        method: "POST",
+        headers: {
+          Authorization:
+            "Bearer sk-90Jd8cyDCCjWFNJBE25bQLCr7Os0ObHik9is2A7Djz8Sy2K2",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       })
-      .catch((error) => {
-        NotificationManager.error(
-          "Doh! You need to purchase additional credits to run more Gooey.AI recipes: https://gooey.ai/account",
-          "",
-          3000
-        );
-        console.log(error);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data && data.output && data.output.output_text != undefined) {
+            NotificationManager.success("Launch Successfully", "", 3000);
+            setShowData(false);
+            setShowGetData(true);
+            setDataItem(data.output.output_text);
+          } else if (data.detail && data.detail.error) {
+            NotificationManager.error(
+              "Doh! You need to purchase additional credits to run more Gooey.AI recipes: https://gooey.ai/account",
+              "",
+              3000
+            );
+            setShowData(false);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          // NotificationManager.error(error, "", 3000);
+          setShowData(false);
+        });
+    } else {
+      NotificationManager.error(
+        "Please Completely filled prompt, Modal and select Brand/Product",
+        "",
+        3000
+      );
+    }
   };
 
   const handleClickReset = () => {
-    console.log("first");
     setShowGetData(false);
+    setPromptData("");
+    setCheckedItems([]);
+    setSelectedItems({});
+    setAgainSelectedItems([]);
+    setSelectedOption(null);
+    setSelectAll(false);
+    setSelectedCount(0);
+    setShowCheckBoxData(false);
+    setCompetitors("");
+    setPromptBrandKey("");
   };
 
   const dataStyle = {
@@ -207,6 +333,16 @@ function MainPage() {
     </div>
   ));
 
+  const handleCompetitorChange = (index, e) => {
+    const updatedCompetitors = [...competitors];
+    updatedCompetitors[index] = e.target.value;
+    setCompetitors(updatedCompetitors);
+  };
+
+  const handlePromptBrandReachChange = (e) => {
+     setPromptBrandReach(e.target.value);
+   };
+
   return (
     <div className="">
       <Navbar className="bg-white p-2 mb-5">
@@ -219,10 +355,10 @@ function MainPage() {
               height="30"
               className="d-inline-block align-top"
             />{" "}
-            &nbsp; LLM and Co-Pilot Brand Navigator
+            &nbsp; LLM and Co-Pilot Brand Luminare
             <br />
             <span className="fs-6" style={{ marginLeft: "3rem" }}>
-              Brand discovery for LLMs
+              Brand Discovery and Monitoring
             </span>
           </Navbar.Brand>
           <Navbar.Brand className="d-flex flex-1 d-block d-md-none">
@@ -276,7 +412,7 @@ function MainPage() {
       </Navbar>
       <Container fluid>
         <Container className="border border-secondary-subtle borderSet mt">
-          <h4 className="float-start text1">Find your LLM Benchmark</h4>
+          <h4 className="float-start text1">Find Your LLM Benchmark</h4>
           <div className="p-3 mt-5">
             <Container className="back">
               <Form className="form-inline form-quicksearch mx-auto mt-2 p-3">
@@ -285,9 +421,28 @@ function MainPage() {
                     What Would You Like to Focus On?
                   </h6>
 
+                  {/*------------------ Company/Brand First Section -----------------*/}
+                  {selectedOptionShow === "Company/Brand" && (
+                    <>
+                      <Form.Group as={Col} md="12">
+                        <Form.Control
+                          as="textarea"
+                          rows={1}
+                          cols={2}
+                          name="firstName"
+                          placeholder="Company/Brand (input)"
+                          className="big custom-placeholder mt-2"
+                          value={promptData}
+                          onChange={(e) => setPromptData(e.target.value)}
+                        />
+                      </Form.Group>
+                    </>
+                  )}
+                  {/*------------------ Company/Brand First Section -----------------*/}
+
                   <Form.Group as={Col} md="12">
                     <Row>
-                      <ul class="nav brand-tabs">
+                      <ul className="nav brand-tabs">
                         <Col md="2">
                           <li style={{ cursor: "pointer" }}>
                             <a
@@ -304,7 +459,7 @@ function MainPage() {
                             </a>
                           </li>
                         </Col>
-                        <Col md="2">
+                        <Col md="auto">
                           <li style={{ cursor: "pointer" }}>
                             <a
                               className={`nav-link ${
@@ -318,38 +473,41 @@ function MainPage() {
                             </a>
                           </li>
                         </Col>
+                        <Col md="2">
+                          <li style={{ cursor: "pointer" }}>
+                            <a
+                              className={`nav-link ${
+                                selectedOptionShow === "Key Prompt"
+                                  ? "active cursor-pointer"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                handleRadioSectionShow("Key Prompt")
+                              }
+                            >
+                              <span></span> Key Prompt
+                            </a>
+                          </li>
+                        </Col>
                       </ul>
                     </Row>
                   </Form.Group>
 
-                  {/*------------------ Company/Brand Section -----------------*/}
-
+                  {/*------------------ Company/Brand Second Section -----------------*/}
                   {selectedOptionShow === "Company/Brand" && (
                     <>
-                      <Form.Group as={Col} md="4">
-                        <Form.Control
-                          type="text"
-                          name="firstName"
-                          placeholder="Company/Brand (input)"
-                          className="height0 custom-placeholder mb-3"
-                          onChange={(e) => setPromptData(e.target.value)}
-                        />
-                      </Form.Group>
-
                       <Form.Group
                         as={Col}
                         md="4"
                         className="cursor-pointer"
-                        onClick={() =>
-                          handleRadioSelection("Brand Representation")
-                        }
+                        onClick={() => handleRadioSelection("Brand Overview")}
                       >
                         <Form.Check
                           type="radio"
                           name="firstName"
-                          label="Brand Representation"
+                          label="Brand Overview"
                           className="height1 custom-checkbox mb-3"
-                          checked={selectedOption === "Brand Representation"}
+                          checked={selectedOption === "Brand Overview"}
                         />
                       </Form.Group>
 
@@ -374,6 +532,21 @@ function MainPage() {
                         as={Col}
                         md="4"
                         className="cursor-pointer"
+                        onClick={() => handleRadioSelection("Monitoring")}
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Monitoring"
+                          className="height3 custom-checkbox mb-3"
+                          checked={selectedOption === "Monitoring"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
                         onClick={() => handleRadioSelection("Brand Reach")}
                       >
                         <Form.Check
@@ -384,9 +557,40 @@ function MainPage() {
                           checked={selectedOption === "Brand Reach"}
                         />
                       </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() => handleRadioSelection("Competition")}
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Competition"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Competition"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleRadioSelection("Dashboard/Reporting")
+                        }
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Dashboard/Reporting"
+                          className="height3 custom-checkbox mb-3"
+                          checked={selectedOption === "Dashboard/Reporting"}
+                        />
+                      </Form.Group>
                     </>
                   )}
-                  {/*------------------ Company/Brand Section -----------------*/}
+                  {/*------------------ Company/Brand Second Section -----------------*/}
 
                   {/*-------------------------- Product -----------------------*/}
                   {selectedOptionShow === "Product" && (
@@ -397,6 +601,7 @@ function MainPage() {
                           name="firstName"
                           placeholder="Product (input)"
                           className="height0 custom-placeholder mb-3"
+                          value={promptData}
                           onChange={(e) => setPromptData(e.target.value)}
                         />
                       </Form.Group>
@@ -449,60 +654,86 @@ function MainPage() {
                           checked={selectedOption === "Product Reach"}
                         />
                       </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() => handleRadioSelection("Competition")}
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Competition"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Competition"}
+                        />
+                      </Form.Group>
+
+                      <Form.Group
+                        as={Col}
+                        md="4"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleRadioSelection("Dashboard/Reporting")
+                        }
+                      >
+                        <Form.Check
+                          type="radio"
+                          name="firstName"
+                          label="Dashboard/Reporting"
+                          className="height1 custom-checkbox mb-3"
+                          checked={selectedOption === "Dashboard/Reporting"}
+                        />
+                      </Form.Group>
                     </>
                   )}
                   {/*------------------------- Product ------------------------*/}
 
-                  <Form.Group
-                    as={Col}
-                    md="4"
-                    className="cursor-pointer"
-                    onClick={() => handleRadioSelection("Competition")}
-                  >
-                    <Form.Check
-                      type="radio"
-                      name="firstName"
-                      label="Competition"
-                      className="height1 custom-checkbox mb-3"
-                      checked={selectedOption === "Competition"}
-                    />
-                  </Form.Group>
+                  {/*-------------------------- Key Prompt -----------------------*/}
+                  {selectedOptionShow === "Key Prompt" && (
+                    <>
+                      {/* <Form.Group as={Col} md="6">
+                        <Form.Control
+                          type="text"
+                          name="firstName"
+                          placeholder="Company/Brand/Product"
+                          className="height0 custom-placeholder mb-3"
+                          value={promptBrand}
+                          onChange={(e) => setPromptBrand(e.target.value)}
+                        />
+                      </Form.Group> */}
 
-                  <Form.Group
-                    as={Col}
-                    md="4"
-                    className="cursor-pointer"
-                    onClick={() =>
-                      handleRadioSelection("Hallucinations Identification")
-                    }
-                  >
-                    <Form.Check
-                      type="radio"
-                      name="firstName"
-                      label="Hallucinations Identification"
-                      className="height1 custom-checkbox mb-3"
-                      checked={
-                        selectedOption === "Hallucinations Identification"
-                      }
-                    />
-                  </Form.Group>
+                      <Form.Group as={Col} md="12">
+                        <Form.Control
+                          as="textarea"
+                          rows={1}
+                          cols={2}  
+                          name="firstName"
+                          placeholder="Enter the Key Prompt"
+                          className="big custom-placeholder mb-3"
+                          value={promptBrandKey}
+                          onChange={(e) => setPromptBrandKey(e.target.value)}
+                        />
+                      </Form.Group>
+                    </>
+                  )}
+                  {/*-------------------------- Key Prompt -----------------------*/}
 
-                  {selectedOption === "Brand Representation" && (
+                  {selectedOption === "Brand Overview" && (
                     <Container className="mb-3">
                       <Card as={Col} md="12" className="border-0 whi">
                         <Card.Body>
-                          <Card.Title className="">
-                            Brand Representation
-                          </Card.Title>
+                          <Card.Title className="">Brand Overview</Card.Title>
                           <Card.Text className="mt-4">
                             What dimensions do you want to focus on (choose all
                             that apply)
                           </Card.Text>
-                          <ul class="focus-on">
+                          <ul className="focus-on">
                             {[
                               "Brand Description",
                               "Brand Attributes",
-                              "Brand Image Logos",
+                              "Brand Image and Logos",
+                              "Competitive Set",
                               "Sources",
                             ].map((key) => (
                               <li key={key}>
@@ -513,7 +744,7 @@ function MainPage() {
                                   checked={checkedItems.includes(key)}
                                   onChange={() =>
                                     handleCheckBoxChange(
-                                      "brandRepresentation",
+                                      "Brand Representation",
                                       key
                                     )
                                   }
@@ -523,9 +754,9 @@ function MainPage() {
                             ))}
                           </ul>
                           <small>
-                            Note: interactive bot would ask what the user would
+                            {/* Note: interactive bot would ask what the user would
                             like to focus on. Prompt is written based on this
-                            feedback
+                            feedback */}
                           </small>
                         </Card.Body>
                       </Card>
@@ -541,7 +772,7 @@ function MainPage() {
                             What dimensions do you want to focus on (choose all
                             that apply)
                           </Card.Text>
-                          <ul class="focus-on">
+                          <ul className="focus-on">
                             {[
                               "Top 5 Positive and Negative Attributes",
                               "Competitor Comparison",
@@ -555,7 +786,7 @@ function MainPage() {
                                   checked={checkedItems.includes(key)}
                                   onChange={() =>
                                     handleCheckBoxChange(
-                                      "brandRepresentation",
+                                      "Brand Favorability",
                                       key
                                     )
                                   }
@@ -565,9 +796,9 @@ function MainPage() {
                             ))}
                           </ul>
                           <small>
-                            Note: interactive bot would ask what the user would
+                            {/* Note: interactive bot would ask what the user would
                             like to focus on. Prompt is written based on this
-                            feedback
+                            feedback */}
                           </small>
                         </Card.Body>
                       </Card>
@@ -580,11 +811,11 @@ function MainPage() {
                         <Card.Body>
                           <Card.Title className="">Brand Reach</Card.Title>
                           <Card.Text>
-                            <ul class="nav brand-tabs">
+                            {/* <ul className="nav brand-tabs">
                               <li>
                                 <a
-                                  class={
-                                    selectedDotShow === "Input key Prompt"
+                                  className={
+                                    selectedDotShow === "Input key Prompt :"
                                       ? "active"
                                       : ""
                                   }
@@ -592,7 +823,7 @@ function MainPage() {
                                   href=""
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    handleDotShow("Input key Prompt");
+                                    handleDotShow("Input key Prompt :");
                                   }}
                                 >
                                   <span></span> Input key Prompt
@@ -600,8 +831,9 @@ function MainPage() {
                               </li>
                               <li>
                                 <a
-                                  class={
-                                    selectedDotShow === "Generate top 3 Prompt"
+                                  className={
+                                    selectedDotShow ===
+                                    "Generate top 3 Prompt :"
                                       ? "active"
                                       : ""
                                   }
@@ -609,16 +841,46 @@ function MainPage() {
                                   href=""
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    handleDotShow("Generate top 3 Prompt");
+                                    handleDotShow("Generate top 3 Prompt :");
                                   }}
                                 >
                                   <span></span> Generate top 3 Prompt
                                 </a>
                               </li>
+                            </ul> */}
+
+                            <ul className="focus-on mt-4">
+                              <li>
+                                <input
+                                  type="text"
+                                  placeholder="Prompt"
+                                  name="promptBrandReach"
+                                  value={promptBrandReach}
+                                  onChange={handlePromptBrandReachChange}
+                                />
+                              </li>
                             </ul>
                           </Card.Text>
-                          {selectedDotShow === "Input key Prompt" && (
-                            <ul class="focus-on">
+                          {/* {selectedDotShow === "Input key Prompt :" && ( */}
+                          <ul className="focus-on">
+                            {["Responses", "Sources"].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange("Brand Reach", key)
+                                  }
+                                />{" "}
+                                {key}
+                              </li>
+                            ))}
+                          </ul>
+                          {/* )} */}
+                          {/* {selectedDotShow === "Generate top 3 Prompt :" && (
+                            <ul className="focus-on">
                               {[
                                 "Mention Rate and Ranking",
                                 "Competitive Set",
@@ -632,48 +894,19 @@ function MainPage() {
                                     value=""
                                     checked={checkedItems.includes(key)}
                                     onChange={() =>
-                                      handleCheckBoxChange(
-                                        "brandRepresentation",
-                                        key
-                                      )
+                                      handleCheckBoxChange("Brand Reach", key)
                                     }
                                   />{" "}
                                   {key}
                                 </li>
                               ))}
                             </ul>
-                          )}
-                          {selectedDotShow === "Generate top 3 Prompt" && (
-                            <ul class="focus-on">
-                              {[
-                                "Mention Rate and Ranking",
-                                "Competitive Set",
-                                "Sources for Brand Info",
-                                "Sources for overall Info",
-                              ].map((key) => (
-                                <li key={key}>
-                                  <input
-                                    type="checkbox"
-                                    name=""
-                                    value=""
-                                    checked={checkedItems.includes(key)}
-                                    onChange={() =>
-                                      handleCheckBoxChange(
-                                        "brandRepresentation",
-                                        key
-                                      )
-                                    }
-                                  />{" "}
-                                  {key}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                          <small>
+                          )} */}
+                          {/* <small>
                             Prompt or up to 3 prompts are writtent based on
                             prompt feedback. Also could be a possibility of bot
                             to recommend prompts.
-                          </small>
+                          </small> */}
                         </Card.Body>
                       </Card>
                     </Container>
@@ -690,11 +923,11 @@ function MainPage() {
                             What dimensions do you want to focus on (choose all
                             that apply)
                           </Card.Text>
-                          <ul class="focus-on">
+                          <ul className="focus-on">
                             {[
-                              "Brand Description",
-                              "Brand Attributes",
-                              "Brand Image Logos",
+                              "Product Description",
+                              "Product Attributes",
+                              "Product Image and Logos",
                               "Sources",
                             ].map((key) => (
                               <li key={key}>
@@ -705,7 +938,7 @@ function MainPage() {
                                   checked={checkedItems.includes(key)}
                                   onChange={() =>
                                     handleCheckBoxChange(
-                                      "brandRepresentation",
+                                      "Product Representation",
                                       key
                                     )
                                   }
@@ -715,9 +948,9 @@ function MainPage() {
                             ))}
                           </ul>
                           <small>
-                            Note: interactive bot would ask what the user would
+                            {/* Note: interactive bot would ask what the user would
                             like to focus on. Prompt is written based on this
-                            feedback
+                            feedback */}
                           </small>
                         </Card.Body>
                       </Card>
@@ -733,7 +966,7 @@ function MainPage() {
                             What dimensions do you want to focus on (choose all
                             that apply)
                           </Card.Text>
-                          <ul class="focus-on">
+                          <ul className="focus-on">
                             {[
                               "Top 5 Positive and Negative Attributes",
                               "Competitor Comparison",
@@ -747,7 +980,7 @@ function MainPage() {
                                   checked={checkedItems.includes(key)}
                                   onChange={() =>
                                     handleCheckBoxChange(
-                                      "brandRepresentation",
+                                      "Product Favorability",
                                       key
                                     )
                                   }
@@ -757,9 +990,9 @@ function MainPage() {
                             ))}
                           </ul>
                           <small>
-                            Note: interactive bot would ask what the user would
+                            {/* Note: interactive bot would ask what the user would
                             like to focus on. Prompt is written based on this
-                            feedback
+                            feedback */}
                           </small>
                         </Card.Body>
                       </Card>
@@ -772,11 +1005,11 @@ function MainPage() {
                         <Card.Body>
                           <Card.Title className="">Product Reach</Card.Title>
                           <Card.Text>
-                            <ul class="nav brand-tabs">
+                            {/* <ul className="nav brand-tabs">
                               <li>
                                 <a
-                                  class={
-                                    selectedDotShow === "Input key Prompt"
+                                  className={
+                                    selectedDotShow === "Input key Prompt :"
                                       ? "active"
                                       : ""
                                   }
@@ -784,7 +1017,7 @@ function MainPage() {
                                   href=""
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    handleDotShow("Input key Prompt");
+                                    handleDotShow("Input key Prompt :");
                                   }}
                                 >
                                   <span></span> Input key Prompt
@@ -792,8 +1025,9 @@ function MainPage() {
                               </li>
                               <li>
                                 <a
-                                  class={
-                                    selectedDotShow === "Generate top 3 Prompt"
+                                  className={
+                                    selectedDotShow ===
+                                    "Generate top 3 Prompt :"
                                       ? "active"
                                       : ""
                                   }
@@ -801,16 +1035,34 @@ function MainPage() {
                                   href=""
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    handleDotShow("Generate top 3 Prompt");
+                                    handleDotShow("Generate top 3 Prompt :");
                                   }}
                                 >
                                   <span></span> Generate top 3 Prompt
                                 </a>
                               </li>
-                            </ul>
+                            </ul> */}
                           </Card.Text>
-                          {selectedDotShow === "Input key Prompt" && (
-                            <ul class="focus-on">
+                          {/* {selectedDotShow === "Input key Prompt :" && ( */}
+                          <ul className="focus-on">
+                            {["Responses", "Sources"].map((key) => (
+                              <li key={key}>
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  checked={checkedItems.includes(key)}
+                                  onChange={() =>
+                                    handleCheckBoxChange("Product Reach", key)
+                                  }
+                                />{" "}
+                                {key}
+                              </li>
+                            ))}
+                          </ul>
+                          {/* )} */}
+                          {/* {selectedDotShow === "Generate top 3 Prompt :" && (
+                            <ul className="focus-on">
                               {[
                                 "Mention Rate and Ranking",
                                 "Competitive Set",
@@ -824,36 +1076,7 @@ function MainPage() {
                                     value=""
                                     checked={checkedItems.includes(key)}
                                     onChange={() =>
-                                      handleCheckBoxChange(
-                                        "brandRepresentation",
-                                        key
-                                      )
-                                    }
-                                  />{" "}
-                                  {key}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                          {selectedDotShow === "Generate top 3 Prompt" && (
-                            <ul class="focus-on">
-                              {[
-                                "Mention Rate and Ranking",
-                                "Competitive Set",
-                                "Sources for Brand Info",
-                                "Sources for overall Info",
-                              ].map((key) => (
-                                <li key={key}>
-                                  <input
-                                    type="checkbox"
-                                    name=""
-                                    value=""
-                                    checked={checkedItems.includes(key)}
-                                    onChange={() =>
-                                      handleCheckBoxChange(
-                                        "brandRepresentation",
-                                        key
-                                      )
+                                      handleCheckBoxChange("Product Reach", key)
                                     }
                                   />{" "}
                                   {key}
@@ -865,121 +1088,68 @@ function MainPage() {
                             Prompt or up to 3 prompts are writtent based on
                             prompt feedback. Also could be a possibility of bot
                             to recommend prompts.
-                          </small>
+                          </small> */}
                         </Card.Body>
                       </Card>
                     </Container>
                   )}
 
-                  {selectedOption === "Competition" && (
-                    <Container className="mb-4">
-                      <Card as={Col} md="12" className="border-0 whi">
-                        <Card.Body>
-                          <Card.Title className="">Competition</Card.Title>
-                          <ul class="focus-on mt-4">
-                            <li className="mb-3">
-                              <input
-                                type="checkbox"
-                                name=""
-                                value=""
-                                onChange={handleCheckBoxData}
-                              />{" "}
-                              Input Competitive (up to 3)
-                            </li>
+                  {selectedOption === "Competition" &&
+                    selectedOptionShow === "Company/Brand" && (
+                      <Container className="mb-4">
+                        <Card as={Col} md="12" className="border-0 whi">
+                          <Card.Body>
+                            <Card.Title className="">Competition</Card.Title>
+                            <ul className="focus-on mt-4">
+                              <li className="mb-3">
+                                <input
+                                  type="checkbox"
+                                  name=""
+                                  value=""
+                                  onChange={handleCheckBoxData}
+                                />{" "}
+                                Input Competitors (up to 3)
+                              </li>
 
-                            {showCheckBoxData ? (
-                              <div class="compitorsbox productcompit">
-                                <span class="d-flex">
-                                  <input
-                                    type="text"
-                                    name="coupon_field"
-                                    placeholder="Competitor 1"
-                                    id="coupon_field"
-                                  />
-                                </span>
-                                <span class="d-flex">
-                                  <input
-                                    type="text"
-                                    name="coupon_field"
-                                    placeholder="Competitor 2"
-                                    id="coupon_field"
-                                  />
-                                </span>
-                                <span class="d-flex">
-                                  <input
-                                    type="text"
-                                    name="coupon_field"
-                                    placeholder="Competitor 3"
-                                    id="coupon_field"
-                                  />
-                                </span>
-                              </div>
-                            ) : (
-                              ""
-                            )}
+                              {showCheckBoxData ? (
+                                <div className="compitorsbox productcompit">
+                                  {[0, 1, 2].map((index) => (
+                                    <span className="d-flex" key={index}>
+                                      <input
+                                        type="text"
+                                        name="coupon_field"
+                                        placeholder={`Competitor ${index + 1}`}
+                                        value={competitors[index]}
+                                        onChange={(e) =>
+                                          handleCompetitorChange(index, e)
+                                        }
+                                      />
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                ""
+                              )}
 
-                            <li>What Dimensions Would You Like to Focus On?</li>
-                            <ul
-                              style={{ listStyle: "none", paddingLeft: "18px" }}
-                            >
-                              <li>Brand Representation Comparison</li>
+                              <li>
+                                What Dimensions Would You Like to Focus On?
+                              </li>
                               <ul
-                                style={{ listStyle: "none", padding: "0 20px" }}
+                                style={{
+                                  listStyle: "none",
+                                  paddingLeft: "18px",
+                                }}
                               >
-                                {[
-                                  "Brand Description",
-                                  "Brand Attributes",
-                                  "Brand Image and Logos",
-                                  "Sources",
-                                ].map((key) => (
-                                  <li key={key}>
-                                    <input
-                                      type="checkbox"
-                                      name=""
-                                      value=""
-                                      checked={checkedItems.includes(key)}
-                                      onChange={() =>
-                                        handleCheckBoxChange(
-                                          "brandRepresentation",
-                                          key
-                                        )
-                                      }
-                                    />{" "}
-                                    {key}
-                                  </li>
-                                ))}
-                              </ul>
-                              <li>Brand Favorability Comparison</li>
-                              <ul
-                                style={{ listStyle: "none", padding: "0 20px" }}
-                              >
-                                {[
-                                  "5 Positive and negative Attributes",
-                                  "Sources",
-                                ].map((key) => (
-                                  <li key={key}>
-                                    <input
-                                      type="checkbox"
-                                      name=""
-                                      value=""
-                                      checked={checkedItems.includes(key)}
-                                      onChange={() =>
-                                        handleCheckBoxChange(
-                                          "brandRepresentation",
-                                          key
-                                        )
-                                      }
-                                    />{" "}
-                                    {key}
-                                  </li>
-                                ))}
-                              </ul>
-                              <li>Brand Reach Comparison</li>
-                              <ul
-                                style={{ listStyle: "none", padding: "0 20px" }}
-                              >
-                                {["Mention Rate and Rankings", "Sources"].map(
-                                  (key) => (
+                                <ul
+                                  style={{
+                                    listStyle: "none",
+                                    padding: "0 20px",
+                                  }}
+                                >
+                                  {[
+                                    "Brand Description",
+                                    "Top 5 Positive and Negative Attributes",
+                                  ].map((key) => (
                                     <li key={key}>
                                       <input
                                         type="checkbox"
@@ -988,60 +1158,179 @@ function MainPage() {
                                         checked={checkedItems.includes(key)}
                                         onChange={() =>
                                           handleCheckBoxChange(
-                                            "brandRepresentation",
+                                            "Brand Representation Competition",
                                             key
                                           )
                                         }
                                       />{" "}
                                       {key}
                                     </li>
-                                  )
-                                )}
+                                  ))}
+                                </ul>
                               </ul>
                             </ul>
-                          </ul>
-                        </Card.Body>
-                      </Card>
-                    </Container>
-                  )}
+                          </Card.Body>
+                        </Card>
+                      </Container>
+                    )}
 
-                  {selectedOption === "Hallucinations Identification" && (
-                    <Container className="mb-3">
-                      <Card as={Col} md="12" className="border-0 whi">
-                        <Card.Body>
-                          <Card.Title className="mb-4">
-                            Hallucinations Identification
-                          </Card.Title>
-
-                          <ul class="focus-on">
-                            {[
-                              "Company Description",
-                              "Company Key Facts",
-                              "Brand Representation",
-                              "Brand Logos and Images",
-                              "Executive Bios",
-                            ].map((key) => (
-                              <li key={key}>
+                  {selectedOption === "Competition" &&
+                    selectedOptionShow === "Product" && (
+                      <Container className="mb-4">
+                        <Card as={Col} md="12" className="border-0 whi">
+                          <Card.Body>
+                            <Card.Title className="">Competition</Card.Title>
+                            <ul className="focus-on mt-4">
+                              <li className="mb-3">
                                 <input
                                   type="checkbox"
                                   name=""
                                   value=""
-                                  checked={checkedItems.includes(key)}
-                                  onChange={() =>
-                                    handleCheckBoxChange(
-                                      "brandRepresentation",
-                                      key
-                                    )
-                                  }
+                                  onChange={handleCheckBoxData}
                                 />{" "}
-                                {key}
+                                Input Competitors (up to 3)
                               </li>
-                            ))}
-                          </ul>
-                        </Card.Body>
-                      </Card>
-                    </Container>
-                  )}
+
+                              {showCheckBoxData ? (
+                                <div className="compitorsbox productcompit">
+                                  {[0, 1, 2].map((index) => (
+                                    <span className="d-flex" key={index}>
+                                      <input
+                                        type="text"
+                                        name="coupon_field"
+                                        placeholder={`Competitor ${index + 1}`}
+                                        value={competitors[index]}
+                                        onChange={(e) =>
+                                          handleCompetitorChange(index, e)
+                                        }
+                                      />
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                ""
+                              )}
+
+                              <li>
+                                What Dimensions Would You Like to Focus On?
+                              </li>
+                              <ul
+                                style={{
+                                  listStyle: "none",
+                                  paddingLeft: "18px",
+                                }}
+                              >
+                                <ul
+                                  style={{
+                                    listStyle: "none",
+                                    padding: "0 20px",
+                                  }}
+                                >
+                                  {[
+                                    "Product Description",
+                                    "Top 5 Positive and Negative Attributes",
+                                  ].map((key) => (
+                                    <li key={key}>
+                                      <input
+                                        type="checkbox"
+                                        name=""
+                                        value=""
+                                        checked={checkedItems.includes(key)}
+                                        onChange={() =>
+                                          handleCheckBoxChange(
+                                            "Product Representation Competition",
+                                            key
+                                          )
+                                        }
+                                      />{" "}
+                                      {key}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </ul>
+                            </ul>
+                          </Card.Body>
+                        </Card>
+                      </Container>
+                    )}
+
+                  {selectedOption === "Dashboard/Reporting" &&
+                    selectedOptionShow === "Company/Brand" && (
+                      <Container className="mb-3">
+                        <Card as={Col} md="12" className="border-0 whi">
+                          <Card.Body>
+                            <Card.Title className="mb-4">
+                              Dashboard/Reporting
+                            </Card.Title>
+
+                            <ul className="focus-on">
+                              {[
+                                "Company Description",
+                                "Company Key Facts",
+                                "Brand Representation",
+                                "Brand Image and Logos",
+                                "Executive Bios",
+                              ].map((key) => (
+                                <li key={key}>
+                                  <input
+                                    type="checkbox"
+                                    name=""
+                                    value=""
+                                    checked={checkedItems.includes(key)}
+                                    onChange={() =>
+                                      handleCheckBoxChange(
+                                        "Dashboard/Reporting",
+                                        key
+                                      )
+                                    }
+                                  />{" "}
+                                  {key}
+                                </li>
+                              ))}
+                            </ul>
+                          </Card.Body>
+                        </Card>
+                      </Container>
+                    )}
+
+                  {selectedOption === "Dashboard/Reporting" &&
+                    selectedOptionShow === "Product" && (
+                      <Container className="mb-3">
+                        <Card as={Col} md="12" className="border-0 whi">
+                          <Card.Body>
+                            <Card.Title className="mb-4">
+                              Dashboard/Reporting
+                            </Card.Title>
+
+                            <ul className="focus-on">
+                              {[
+                                "Company Description",
+                                "Company Key Facts",
+                                "Product Representation",
+                                "Product Image and Logos",
+                                "Executive Bios",
+                              ].map((key) => (
+                                <li key={key}>
+                                  <input
+                                    type="checkbox"
+                                    name=""
+                                    value=""
+                                    checked={checkedItems.includes(key)}
+                                    onChange={() =>
+                                      handleCheckBoxChange(
+                                        "Dashboard/Reporting",
+                                        key
+                                      )
+                                    }
+                                  />{" "}
+                                  {key}
+                                </li>
+                              ))}
+                            </ul>
+                          </Card.Body>
+                        </Card>
+                      </Container>
+                    )}
 
                   <Form.Group as={Col} md="12">
                     <Row>
@@ -1083,18 +1372,19 @@ function MainPage() {
 
                             {options.map((option, index) => (
                               <Form.Check
-                                key={option}
+                                key={option.name}
                                 type="checkbox"
-                                label={option}
+                                label={option.name}
                                 className={`mb-2 ${
-                                  index === options.length - 1
+                                  index >= options.length - 3
                                     ? "gray-checkbox"
                                     : ""
                                 } customData`}
-                                checked={selectedItems[option] || false}
+                                checked={selectedItems[option.value] || false}
                                 onChange={(event) =>
+                                  index < options.length - 3 &&
                                   handleCheckChange(
-                                    option,
+                                    option.value,
                                     event.target.checked
                                   )
                                 }
@@ -1115,9 +1405,22 @@ function MainPage() {
                             color: "white",
                           }}
                           onClick={handleClickShow}
-                          disabled={Object.keys(selectedItems).length === 0}
+                          disabled={showData}
                         >
-                          {showData ? <>Please Wait...</> : <>LAUNCH</>}
+                          {showData ? (
+                            <div style={{ fontSize: "19px" }}>
+                              <Spinner
+                                as="span"
+                                animation="grow"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                              />
+                              Please Wait...
+                            </div>
+                          ) : (
+                            <div>LAUNCH</div>
+                          )}
                         </Button>
                       </Col>
 
@@ -1133,6 +1436,7 @@ function MainPage() {
                             color: "white",
                           }}
                           onClick={handleClickReset}
+                          disabled={showData}
                         >
                           RESET
                         </Button>
@@ -1147,38 +1451,33 @@ function MainPage() {
               <Row className="mt-5 mb-4">
                 <Col md="8">
                   <Card className="border border-secondary-subtle rounded-0">
-                    <Card.Header className="float-start  p-3 bottom">
+                    <Card.Header className="float-start p-3 bottom">
                       LLMs
                     </Card.Header>
                     <Container className="mt-3">
                       <Card.Body>
                         {Object.keys(dataItem).map((name) => (
                           <>
-                            <div class="dboxcont" key={name}>
-                              <nav class="card-header-actions">
+                            <div className="dboxcont" key={name}>
+                              <nav className="card-header-actions">
                                 <a
-                                  class="card-header-action"
+                                  className="card-header-action"
                                   aria-expanded="false"
                                   aria-controls="card1"
                                   title="Copy"
                                   style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    copyToClipboard(dataItem[name][0])
+                                  }
                                 >
-                                  <i class="fas fa-clipboard"></i>
+                                  <i className="fas fa-clipboard"></i>
                                 </a>
                               </nav>
-                              <span class="brnd">{name}</span>
-                              <h4 class="card-title">{selectedOption}</h4>
-                              <p class="card-text">
-                                <b>
-                                  {selectedOptionShow === "Product" ? (
-                                    <>Product Description:</>
-                                  ) : (
-                                    <>Brand Description:</>
-                                  )}
-                                </b>
-                                <br />
-                                {dataItem[name]}
-                              </p>
+                              <span className="brnd">{name}</span>
+                              <h4 className="card-title">{selectedOption} </h4>
+                              <Markdown className="markTable">
+                                {dataItem[name][0]}
+                              </Markdown>
                             </div>
                             <hr />
                           </>
@@ -1407,7 +1706,7 @@ function MainPage() {
                             }}
                             type="checkbox"
                           />{" "}
-                          Brand Accuracy
+                          Brand Representation
                         </span>{" "}
                         <svg
                           id="ucx-e4ee9485-a9e1-4019-ac40-61cc046a1ca5"
@@ -1495,6 +1794,35 @@ function MainPage() {
                             type="checkbox"
                           />{" "}
                           Competition
+                        </span>{" "}
+                        <svg
+                          id="ucx-e4ee9485-a9e1-4019-ac40-61cc046a1ca5"
+                          focusable="false"
+                          preserveAspectRatio="xMidYMid meet"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="#0f62fe"
+                          width="36"
+                          height="36"
+                          viewBox="0 0 36 36"
+                          aria-hidden="true"
+                          data-di-res-id="26678fd6-58246de"
+                          data-di-rand="1697448215957"
+                        >
+                          <polygon points="18 6 16.57 7.393 24.15 15 4 15 4 17 24.15 17 16.57 24.573 18 26 28 16 18 6"></polygon>
+                          <title></title>
+                        </svg>
+                      </li>
+                      <li>
+                        <span>
+                          <input
+                            style={{
+                              marginTop: "5px",
+                              position: "relative",
+                              top: "2px",
+                            }}
+                            type="checkbox"
+                          />{" "}
+                          Hallucination ID
                         </span>{" "}
                         <svg
                           id="ucx-e4ee9485-a9e1-4019-ac40-61cc046a1ca5"

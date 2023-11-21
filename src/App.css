@@ -61,12 +61,25 @@
   padding: 8px 14px !important;
   border-radius: 2px !important;
   font-size: 19px !important;
+  color: black !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  border: none !important;
+  font-weight: 370 !important;
+}
+
+.height3 {
+  padding: 8px 14px !important;
+  border-radius: 2px !important;
+  font-size: 19px !important;
   color: #9da3a9 !important;
   cursor: pointer;
   box-shadow: none !important;
   border: none !important;
-  font-weight: 100 !important;
+  font-weight: 350 !important;
 }
+
+
 
 .height2 {
   padding: 8px 14px !important;
@@ -91,11 +104,11 @@
   padding: 1px 12px !important;
   border-radius: 2px !important;
   font-size: 20px !important;
-  color: #9da3a9 !important;
+  color: #000000c7 !important;
   cursor: pointer;
   border: 1px solid #ced4da !important;
   background-color: #ffffff !important;
-  font-weight: 100 !important;
+  font-weight: 220 !important;
 }
 
 input.form-check-input {
@@ -846,3 +859,63 @@ hr {
   font-size: 16px;
   font-weight: 600;
 }
+
+ul.nav.brand-tabs .active span:after {
+  position: absolute;
+  background: #fff;
+  width: 6px;
+  height: 6px;
+  content: '';
+  top: 4px;
+  left: 4px;
+  border-radius: 50%;
+}
+
+input[type="text"] {
+  color: black !important;
+  font-weight: 360 !important;
+}
+
+
+.markTable table {
+  caption-side: bottom;
+  border-collapse: collapse;
+  width: fit-content;
+  padding: 5px;
+}
+
+.markTable tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+  border-color: white !important;
+  border-style: ridge !important;
+  border-width: 1px !important;
+  padding: 7px;
+}
+
+.markTable tr {
+  border-width: 1px !important;
+}
+
+.markTable th {
+  border-width: 1px !important;
+}
+
+
+.big {
+    padding: 18px 14px !important;
+      border-radius: 2px !important;
+      font-size: 20px !important;
+      box-shadow: none !important;
+      border: 1px solid #9da3a982 !important;
+      font-weight: 100 !important;
+}
+
+textarea{
+    color: black !important;
+    font-weight: 360 !important;
+    overflow: hidden;
+  }
