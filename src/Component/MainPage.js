@@ -42,7 +42,7 @@ function MainPage() {
   //--------------------------------------Select Data-------------------------------------//
   const options = [
     { name: "GPT-4 (OpenAI)", value: "gpt_4" },
-    { name: "Palm2 (Google/Bard)", value: "palm2_chat" },
+    { name: "Palm2 (Google/Bard)", value: "palm2_text" },
     { name: "Llama2 (Meta)", value: "llama2_70b_chat" },
     { name: "Claude (Anthropic)", value: "Claude" },
     { name: "SGE (Google)", value: "SGE" },
@@ -193,12 +193,14 @@ function MainPage() {
         promptBrandKey.length !== 0
           ? `${promptBrandKey}. Please Don't send me incomplete data and Please don't give me any wrong information in response.`
           : `Please provide me specific data of ${promptData} with ${checkedItems}  ${
-              competitors.length !== 0 ? "and" + competitors + "competitor" : ""
+              competitors.length !== 0
+                ? "like" + " " + competitors + " " + "competitor"
+                : ""
             } ${
               promptBrandReach.length !== 0
                 ? "Prompt:" + "" + promptBrandReach
                 : ""
-            } of ${selectedOption}.and  Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
+            } of ${selectedOption}. Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
             ${
               selectedOption != "Competition"
                 ? `I don't want any data in the table in the response.`
@@ -214,7 +216,9 @@ function MainPage() {
             }
             ${
               selectedOption === "Competition"
-                ? `Create a border on the table that contains the following. Company name in the first column, ${competitors} and its related companies in the rows, company description in the second column. The top 5 positive attributes as the third column in that table, and the top 5 negative attributes as the fourth column in that table. Please list all features as concise bullet points.`
+                ? `Create a table that has the following. Company Name as the first column with the companies of ${
+                    (promptData, competitors)
+                  } at the rows, and company description as the second column. The top 5 positive attributes as the third column in that table, and the Top 5 negative attributes as the 4th column in the table. Please list all attributes as concise bullet points within each table cell.`
                 : ""
             }
             ${
@@ -254,7 +258,7 @@ function MainPage() {
         method: "POST",
         headers: {
           Authorization:
-            "Bearer sk-90Jd8cyDCCjWFNJBE25bQLCr7Os0ObHik9is2A7Djz8Sy2K2",
+            "Bearer sk-4CysWyEvWHFlvoJxS9FNOFcxUCC7kU4tOyFzBX9t6QZBq6eD",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
