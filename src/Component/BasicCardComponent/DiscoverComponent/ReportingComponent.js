@@ -67,127 +67,140 @@ function ReportingComponent({
                   }
                 />{" "}
                 {key}
+                <br />
                 {checkedItemsReport.includes("LLM Comparison Report") &&
                   key === "LLM Comparison Report" && (
-                    <div className="p-4" ref={tableRef}>
-                      <Table
-                        bordered
-                        responsive
-                        style={tableStyle}
-                        className="mt-3"
-                      >
-                        <thead>
-                          <h4 className="p-3">LLM Comparison Report</h4>
-                          <tr>
-                            {Object.keys(dataItem).map((name) => (
-                              <th
-                                className="text-center"
-                                key={name}
-                                style={thStyle}
-                              >
-                                {" "}
-                                {name === "gpt_4"
-                                  ? "GPT4"
-                                  : name === "palm2_text"
-                                  ? "Palm2"
-                                  : name === "llama2_70b_chat"
-                                  ? "LLama2"
-                                  : ""}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            {Object.keys(dataItem).map((name) => (
-                              <td
-                                key={name}
-                                style={{
-                                  padding: "8px",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                <Markdown
-                                  className="markTable p-3"
-                                  style={mark}
-                                >
-                                  {dataItem[name][0]}
-                                </Markdown>
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </Table>
-                      <Button
-                        variant="primary"
-                        className="mt-3 mb-3 d-flex justify-content-center"
-                        onClick={downloadPDF}
-                        style={buttonData}
-                      >
-                        Download PDF
-                      </Button>
-                    </div>
+                    <>
+                      {showGetData ? (
+                        <div className="p-4" ref={tableRef}>
+                          <Table
+                            bordered
+                            responsive
+                            style={tableStyle}
+                            className="mt-3"
+                          >
+                            <thead>
+                              <h4 className="p-3">LLM Comparison Report</h4>
+                              <tr>
+                                {Object.keys(dataItem).map((name) => (
+                                  <th
+                                    className="text-center"
+                                    key={name}
+                                    style={thStyle}
+                                  >
+                                    {" "}
+                                    {name === "gpt_4"
+                                      ? "GPT4"
+                                      : name === "palm2_text"
+                                      ? "Palm2"
+                                      : name === "llama2_70b_chat"
+                                      ? "LLama2"
+                                      : ""}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                {Object.keys(dataItem).map((name) => (
+                                  <td
+                                    key={name}
+                                    style={{
+                                      padding: "8px",
+                                      backgroundColor: "white",
+                                    }}
+                                  >
+                                    <Markdown
+                                      className="markTable p-3"
+                                      style={mark}
+                                    >
+                                      {dataItem[name][0]}
+                                    </Markdown>
+                                  </td>
+                                ))}
+                              </tr>
+                            </tbody>
+                          </Table>
+                          <Button
+                            variant="primary"
+                            className="mt-3 mb-3 d-flex justify-content-center"
+                            onClick={downloadPDF}
+                            style={buttonData}
+                          >
+                            Download PDF
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="p-3">Report is not Available</div>
+                      )}
+                    </>
                   )}
                 {checkedItemsReport.includes("LLM Competitor Report") &&
                   key === "LLM Competitor Report" && (
-                    <div className="p-4" ref={tableRef}>
-                      <Table
-                        bordered
-                        responsive
-                        style={tableStyle}
-                        className="mt-3"
-                      >
-                        <thead>
-                          <h4 className="p-3">LLM Competition Report</h4>
-                          <tr>
-                            {Object.keys(dataItem).map((name) => (
-                              <th
-                                className="text-center"
-                                key={name}
-                                style={thStyle}
-                              >
-                                {" "}
-                                {name === "gpt_4"
-                                  ? "GPT4"
-                                  : name === "palm2_text"
-                                  ? "Palm2"
-                                  : name === "llama2_70b_chat"
-                                  ? "LLama2"
-                                  : ""}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            {Object.keys(dataItem).map((name) => (
-                              <td
-                                key={name}
-                                style={{
-                                  padding: "8px",
-                                  backgroundColor: "white",
-                                }}
-                              >
-                                <Markdown
-                                  className="markTable p-3"
-                                  style={mark}
-                                >
-                                  {dataItem[name][0]}
-                                </Markdown>
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </Table>
-                      <Button
-                        variant="primary"
-                        className="mt-3 mb-3 d-flex justify-content-center"
-                        onClick={downloadPDF}
-                        style={buttonData}
-                      >
-                        Download PDF
-                      </Button>
-                    </div>
+                    <>
+                      {showGetData ? (
+                        <div className="p-4" ref={tableRef}>
+                          <Table
+                            bordered
+                            responsive
+                            style={tableStyle}
+                            className="mt-3"
+                          >
+                            <thead>
+                              <h4 className="p-3">LLM Competition Report</h4>
+                              <tr>
+                                {Object.keys(dataItem).map((name) => (
+                                  <th
+                                    className="text-center"
+                                    key={name}
+                                    style={thStyle}
+                                  >
+                                    {" "}
+                                    {name === "gpt_4"
+                                      ? "GPT4"
+                                      : name === "palm2_text"
+                                      ? "Palm2"
+                                      : name === "llama2_70b_chat"
+                                      ? "LLama2"
+                                      : ""}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                {Object.keys(dataItem).map((name) => (
+                                  <td
+                                    key={name}
+                                    style={{
+                                      padding: "8px",
+                                      backgroundColor: "white",
+                                    }}
+                                  >
+                                    <Markdown
+                                      className="markTable p-3"
+                                      style={mark}
+                                    >
+                                      {dataItem[name][0]}
+                                    </Markdown>
+                                  </td>
+                                ))}
+                              </tr>
+                            </tbody>
+                          </Table>
+                          <Button
+                            variant="primary"
+                            className="mt-3 mb-3 d-flex justify-content-center"
+                            onClick={downloadPDF}
+                            style={buttonData}
+                          >
+                            Download PDF
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="p-3">Report is not Available</div>
+                      )}
+                    </>
                   )}
               </li>
             ))}
