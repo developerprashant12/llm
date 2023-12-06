@@ -426,8 +426,10 @@ svg:not(:root) {
     left: 40px;
 }
 
+
 .back{
   background-color: #eceff0;
+  margin-top: -30px;
 }
 
 .mt {
@@ -914,8 +916,28 @@ tr {
       font-weight: 100 !important;
 }
 
+
+.big1 {
+  padding: 6px 5px !important;
+  border-radius: 2px !important;
+  font-size: 20px !important;
+  box-shadow: none !important;
+  border: 1px solid #9da3a982 !important;
+  font-weight: 100 !important;
+}
+
 textarea{
     color: black !important;
     font-weight: 360 !important;
     overflow: hidden;
   }
+
+.initialChanges {
+  display: flex;
+  flex-direction: column;
+}
+
+.topData {
+  margin-top: -20px !important;
+  margin-left: 20px;
+}
