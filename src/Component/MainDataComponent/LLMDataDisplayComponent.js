@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Card, Container } from "react-bootstrap";
 import Markdown from "markdown-to-jsx";
 import {
@@ -6,21 +6,53 @@ import {
   deleteDataFromFirebase,
 } from "../../DatabaseFirebase/firebaseService";
 
-const LLMDataDisplayComponent = ({
-  dataItem,
-  copyToClipboard,
-}) => {
+const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
   const [dataHistory, setDataHistory] = useState([]);
+  const alertShownRef = useRef(false);
 
   useEffect(() => {
     fetchDataFromFirebase((data) => {
-       const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
-         key,
-         ...value,
-       }));
+      const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
+        key,
+        ...value,
+      }));
       setDataHistory(arrayOfObjects);
     });
   }, []);
+
+  //--------------------- Match Notification Data ---------------------//
+  useEffect(() => {
+    if (dataHistory.length > 1) {
+      const previousData = dataHistory[dataHistory.length - 2];
+      const newData = dataHistory[dataHistory.length - 1];
+
+      const match =
+        previousData.item &&
+        newData.item &&
+        previousData.data &&
+        newData.data &&
+        previousData.item.item === newData.item.item &&
+        previousData.data === newData.data;
+
+      if (!match && !alertShownRef.current) {
+        alertShownRef.current = true;
+
+        setTimeout(() => {
+          alert("New LLM Data Item Does Not Match Previous LLM Data Item");
+        }, 4000);
+      }
+    }
+  }, [dataHistory]);
+
+  //--- Cleanup alert show again ----//
+  useEffect(() => {
+    return () => {
+      alertShownRef.current = false;
+    };
+  }, []);
+  //--- Cleanup alert show again ----//
+
+  //--------------------- Match Notification Data ---------------------//
 
   // Function to group data by date
   const groupDataByDate = (data) => {
@@ -75,14 +107,13 @@ const LLMDataDisplayComponent = ({
     return dateB - dateA;
   });
 
- const handleDeleteData = (itemKey) => {
-   deleteDataFromFirebase(itemKey, () => {
-     setDataHistory((prevData) =>
-       prevData.filter((item) => item.key !== itemKey)
-     );
-   });
- };
-
+  const handleDeleteData = (itemKey) => {
+    deleteDataFromFirebase(itemKey, () => {
+      setDataHistory((prevData) =>
+        prevData.filter((item) => item.key !== itemKey)
+      );
+    });
+  };
 
   return (
     <Row className="mt-5 mb-4">
@@ -192,6 +223,6 @@ const LLMDataDisplayComponent = ({
       </Col>
     </Row>
   );
-}
+};
 
 export default LLMDataDisplayComponent;

@@ -10,7 +10,6 @@ function ReportingComponent({
   handleCheckBoxChangeReport,
   showGetData,
   dataItem,
-  againSelectedItems,
 }) {
    const tableRef = useRef(null);
 
@@ -49,6 +48,7 @@ function ReportingComponent({
      backgroundColor: "#eceff0",
    };
 
+
   return (
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
@@ -68,6 +68,7 @@ function ReportingComponent({
                 />{" "}
                 {key}
                 <br />
+                {/*----------------- First Section Comparison Data ---------------------*/}
                 {checkedItemsReport.includes("LLM Comparison Report") &&
                   key === "LLM Comparison Report" && (
                     <>
@@ -82,6 +83,7 @@ function ReportingComponent({
                             <thead>
                               <h4 className="p-3">LLM Comparison Report</h4>
                               <tr>
+                                {/* <th style={thStyle}>Heading</th> */}
                                 {Object.keys(dataItem).map((name) => (
                                   <th
                                     className="text-center"
@@ -102,6 +104,16 @@ function ReportingComponent({
                             </thead>
                             <tbody>
                               <tr>
+                                {/* <td
+                                  style={{
+                                    padding: "8px",
+                                    backgroundColor: "white",
+                                  }}
+                                >
+                                  <div style={mark} className="p-3">
+                                    Brand Description
+                                  </div>
+                                </td> */}
                                 {Object.keys(dataItem).map((name) => (
                                   <td
                                     key={name}
@@ -135,6 +147,8 @@ function ReportingComponent({
                       )}
                     </>
                   )}
+                {/*----------------- First Section Comparison Data ---------------------*/}
+                {/*----------------- Second Section Competitor Data ---------------------*/}
                 {checkedItemsReport.includes("LLM Competitor Report") &&
                   key === "LLM Competitor Report" && (
                     <>
@@ -202,6 +216,7 @@ function ReportingComponent({
                       )}
                     </>
                   )}
+                {/*----------------- Second Section Comparison Data ---------------------*/}
               </li>
             ))}
           </ul>

@@ -58,7 +58,6 @@ function MainPage() {
   const [checkedItems, setCheckedItems] = useState([]);
   const [checkedItemsReport, setCheckedItemsReport] = useState([]);
   //----------------------------------Dynamic  Data for API-------------------------------//
-
   //--------------------------------------Select Data-------------------------------------//
   const options = [
     { name: "GPT-4 (OpenAI)", value: "gpt_4" },
@@ -295,7 +294,7 @@ function MainPage() {
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-hoFJ7yNwf0WNgNQPdFEDNnzwr3QwPXmmffKQnGDqRc8ijTkk",
+          "Bearer sk-zTzwaAlYWRsj4S72bBft48zmSxnElGnVjCgTZ1X3irf7DiJU",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -689,6 +688,7 @@ function MainPage() {
                         showGetData={showGetData}
                         dataItem={dataItem}
                         againSelectedItems={againSelectedItems}
+                        checkedItems={checkedItems}
                       />
                     )}
 
@@ -991,10 +991,13 @@ function MainPage() {
                       selectedOptionShow === "Product" && (
                         <ReportingComponent
                           checkedItemsReport={checkedItemsReport}
-                          handleCheckBoxChangeReport={handleCheckBoxChangeReport}
+                          handleCheckBoxChangeReport={
+                            handleCheckBoxChangeReport
+                          }
                           showGetData={showGetData}
                           dataItem={dataItem}
                           againSelectedItems={againSelectedItems}
+                          checkedItems={checkedItems}
                         />
                       )}
 
