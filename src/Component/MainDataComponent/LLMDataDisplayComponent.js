@@ -9,6 +9,16 @@ import {
 const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
   const [dataHistory, setDataHistory] = useState([]);
   const alertShownRef = useRef(false);
+  const [editedData, setEditedData] = useState(null);
+
+console.log("editedData", editedData);
+console.log("dataItem", dataItem);
+
+
+  const handleEditData = (data) => {
+    setEditedData(JSON.parse(data));
+  };
+
 
   useEffect(() => {
     fetchDataFromFirebase((data) => {
@@ -20,39 +30,7 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
     });
   }, []);
 
-  //--------------------- Match Notification Data ---------------------//
-  useEffect(() => {
-    if (dataHistory.length > 1) {
-      const previousData = dataHistory[dataHistory.length - 2];
-      const newData = dataHistory[dataHistory.length - 1];
-
-      const match =
-        previousData.item &&
-        newData.item &&
-        previousData.data &&
-        newData.data &&
-        previousData.item.item === newData.item.item &&
-        previousData.data === newData.data;
-
-      if (!match && !alertShownRef.current) {
-        alertShownRef.current = true;
-
-        setTimeout(() => {
-          alert("New LLM Data Item Does Not Match Previous LLM Data Item");
-        }, 4000);
-      }
-    }
-  }, [dataHistory]);
-
-  //--- Cleanup alert show again ----//
-  useEffect(() => {
-    return () => {
-      alertShownRef.current = false;
-    };
-  }, []);
-  //--- Cleanup alert show again ----//
-
-  //--------------------- Match Notification Data ---------------------//
+  
 
   // Function to group data by date
   const groupDataByDate = (data) => {
@@ -117,47 +95,88 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
 
   return (
     <Row className="mt-5 mb-4">
+      {/*----------------- Display Section --------------------*/}
       <Col md="8">
         <Card className="border border-secondary-subtle rounded-0">
           <Card.Header className="float-start p-3 bottom">LLMs</Card.Header>
           <Container className="mt-3">
             <Card.Body>
-              {Object.keys(dataItem).map((name) => (
+              {editedData ? (
                 <>
-                  <div className="dboxcont" key={name}>
-                    <nav className="card-header-actions">
-                      <a
-                        className="card-header-action"
-                        aria-expanded="false"
-                        aria-controls="card1"
-                        title="Copy"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => copyToClipboard(dataItem[name][0])}
-                      >
-                        <i className="fas fa-clipboard"></i>
-                      </a>
-                    </nav>
-                    <span className="brnd">
-                      {name === "gpt_4"
-                        ? "GPT4"
-                        : name === "palm2_text"
-                        ? "Palm2"
-                        : name === "llama2_70b_chat"
-                        ? "LLama2"
-                        : ""}
-                    </span>
-                    {/* <h4 className="card-title">{selectedOption} </h4>*/}
-                    <Markdown className="markTable">
-                      {dataItem[name][0]}
-                    </Markdown>
-                  </div>
-                  <hr />
+                  {Object.keys(editedData).map((name) => (
+                    <>
+                      <div className="dboxcont" key={name}>
+                        <nav className="card-header-actions">
+                          <a
+                            className="card-header-action"
+                            aria-expanded="false"
+                            aria-controls="card1"
+                            title="Copy"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => copyToClipboard(editedData[name][0])}
+                          >
+                            <i className="fas fa-clipboard"></i>
+                          </a>
+                        </nav>
+                        <span className="brnd">
+                          {name === "gpt_4_turbo"
+                            ? "GPT4 Turbo"
+                            : name === "palm2_text"
+                            ? "Palm2"
+                            : name === "llama2_70b_chat"
+                            ? "Llama2"
+                            : ""}
+                        </span>
+                        {/* <h4 className="card-title">{selectedOption} </h4>*/}
+                        <Markdown className="markTable">
+                          {editedData[name][0]}
+                        </Markdown>
+                      </div>
+                      <hr />
+                    </>
+                  ))}
                 </>
-              ))}
+              ) : (
+                <>
+                  {Object.keys(dataItem).map((name) => (
+                    <>
+                      <div className="dboxcont" key={name}>
+                        <nav className="card-header-actions">
+                          <a
+                            className="card-header-action"
+                            aria-expanded="false"
+                            aria-controls="card1"
+                            title="Copy"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => copyToClipboard(dataItem[name][0])}
+                          >
+                            <i className="fas fa-clipboard"></i>
+                          </a>
+                        </nav>
+                        <span className="brnd">
+                          {name === "gpt_4_turbo"
+                            ? "GPT4 Turbo"
+                            : name === "palm2_text"
+                            ? "Palm2"
+                            : name === "llama2_70b_chat"
+                            ? "Llama2"
+                            : ""}
+                        </span>
+                        {/* <h4 className="card-title">{selectedOption} </h4>*/}
+                        <Markdown className="markTable">
+                          {dataItem[name][0]}
+                        </Markdown>
+                      </div>
+                      <hr />
+                    </>
+                  ))}
+                </>
+              )}
             </Card.Body>
           </Container>
         </Card>
       </Col>
+      {/*----------------- Display Section --------------------*/}
 
       <Col md="4">
         <Card className="border border-secondary-subtle mb-2 rounded-0">
@@ -190,10 +209,26 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
                         </svg>{" "}
                         {data.item ? data.item : "Key Prompt Data"}
                       </h4>
-                      <span
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleDeleteData(data.key)}
-                      >
+                      <span style={{ cursor: "pointer" }}>
+                        {/*------------- Edit Name -------------*/}
+                        <svg
+                          stroke="currentColor"
+                          fill="none"
+                          stroke-width="2"
+                          viewBox="0 0 24 24"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon-sm"
+                          height="1em"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                          onClick={() => handleEditData(data.data)}
+                        >
+                          <path d="M12 20h9"></path>
+                          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                        {/*------------- Edit Name -------------*/}
+                        &nbsp; &nbsp;
                         <svg
                           stroke="currentColor"
                           fill="none"
@@ -205,6 +240,7 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
                           height="1em"
                           width="1em"
                           xmlns="http://www.w3.org/2000/svg"
+                          onClick={() => handleDeleteData(data.key)}
                         >
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

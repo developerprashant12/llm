@@ -1,17 +1,43 @@
 import React from "react";
-import { Container, Card, Col } from "react-bootstrap";
+import { Container, Card, Col,Form } from "react-bootstrap";
 import "../../../../App.css";
 
 
-function MCategoryDimensions({ checkedItems, handleCheckBoxChange }) {
+function MCategoryDimensions({
+  checkedItems,
+  handleCheckBoxChange,
+  handlePromptBrandReachChange,
+  promptBrandReach,
+}) {
   return (
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
         <Card.Body>
           <Card.Title className="mb-4">Brand Category Dimensions</Card.Title>
-
+          <Card.Text>
+            <ul className="focus-on mt-4">
+              <li>
+                <Form.Group as={Col} md="5">
+                  <Form.Control
+                    as="textarea"
+                    rows={1}
+                    cols={2}
+                    placeholder="Enter Brand Category vs. Enter Brand Category Dimensions"
+                    name="promptBrandReach"
+                    value={promptBrandReach}
+                    onChange={handlePromptBrandReachChange}
+                    className="big1"
+                    style={{ height: "70px", width: "28rem" }}
+                  />
+                </Form.Group>
+              </li>
+            </ul>
+          </Card.Text>
           <ul className="focus-on">
-            {["Category", "Dimensions"].map((key) => (
+            {[
+              "Frequently recommended buying criteria/considerations",
+              "Sources",
+            ].map((key) => (
               <li key={key}>
                 <input
                   type="checkbox"

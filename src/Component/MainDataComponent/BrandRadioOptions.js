@@ -52,14 +52,14 @@ function BrandRadioOptions({ selectedOption, handleRadioSelection }) {
         as={Col}
         md="4"
         className="cursor-pointer"
-        onClick={() => handleRadioSelection("Brand Reach")}
+        onClick={() => handleRadioSelection("Category Leadership")}
       >
         <Form.Check
           type="radio"
           name="firstName"
-          label="Brand Reach"
+          label="Category Leadership"
           className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Brand Reach"}
+          checked={selectedOption === "Category Leadership"}
         />
       </Form.Group>
       <Form.Group

@@ -9,17 +9,6 @@ function ProductRadioOptions({
 }) {
   return (
     <>
-      <Form.Group as={Col} md="4">
-        <Form.Control
-          type="text"
-          name="firstName"
-          placeholder="Product (input)"
-          className="height0 custom-placeholder mb-3"
-          value={promptData}
-          onChange={(e) => setPromptData(e.target.value)}
-        />
-      </Form.Group>
-
       <Form.Group
         as={Col}
         md="4"
@@ -39,6 +28,21 @@ function ProductRadioOptions({
         as={Col}
         md="4"
         className="cursor-pointer"
+        onClick={() => handleRadioSelection("Product Reach")}
+      >
+        <Form.Check
+          type="radio"
+          name="firstName"
+          label="Product Reach"
+          className="height1 custom-checkbox mb-3"
+          checked={selectedOption === "Product Reach"}
+        />
+      </Form.Group>
+
+      <Form.Group
+        as={Col}
+        md="4"
+        className="cursor-pointer"
         onClick={() => handleRadioSelection("Dashboard and Reporting")}
       >
         <Form.Check
@@ -50,20 +54,6 @@ function ProductRadioOptions({
         />
       </Form.Group>
 
-      <Form.Group
-        as={Col}
-        md="4"
-        className="cursor-pointer"
-        onClick={() => handleRadioSelection("Product Reach")}
-      >
-        <Form.Check
-          type="radio"
-          name="firstName"
-          label="Product Reach"
-          className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Product Reach"}
-        />
-      </Form.Group>
       <Form.Group
         as={Col}
         md="4"

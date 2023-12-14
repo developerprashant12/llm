@@ -22,7 +22,7 @@ function PReachComponent({
                     as="textarea"
                     rows={1}
                     cols={2}
-                    placeholder="Enter the Prompt"
+                    placeholder="Enter Product Category"
                     name="promptBrandReach"
                     value={promptBrandReach}
                     onChange={handlePromptBrandReachChange}
@@ -33,7 +33,11 @@ function PReachComponent({
             </ul>
           </Card.Text>
           <ul className="focus-on">
-            {["Responses", "Sources"].map((key) => (
+            {[
+              "Top 5 Products in category",
+              "Best Products in category",
+              "Sources"
+            ].map((key) => (
               <li key={key}>
                 <input
                   type="checkbox"

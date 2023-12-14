@@ -33,7 +33,11 @@ function MPReachComponent({
             </ul>
           </Card.Text>
           <ul className="focus-on">
-            {["Responses", "Sources"].map((key) => (
+            {[
+              "Top 5 Products in category",
+              "Best Products in category",
+              "Sources",
+            ].map((key) => (
               <li key={key}>
                 <input
                   type="checkbox"

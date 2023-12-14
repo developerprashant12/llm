@@ -1,9 +1,10 @@
-import React,{useRef} from "react";
-import { Container, Card, Col, Table,Button } from "react-bootstrap";
+import React, { useRef } from "react";
+import { Container, Card, Col, Table, Button } from "react-bootstrap";
 import Markdown from "markdown-to-jsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import "../../../App.css";
+import { useNavigate } from "react-router";
 
 function ReportingComponent({
   checkedItemsReport,
@@ -11,42 +12,54 @@ function ReportingComponent({
   showGetData,
   dataItem,
 }) {
-   const tableRef = useRef(null);
+  const tableRef = useRef(null);
+  const navigate = useNavigate();
 
+  const downloadPDF = () => {
+    const input = tableRef.current;
 
-   const downloadPDF = () => {
-     const input = tableRef.current;
+    html2canvas(input).then((canvas) => {
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
+      pdf.save("LLM Report.pdf");
+    });
+  };
 
-     html2canvas(input).then((canvas) => {
-       const pdf = new jsPDF("p", "mm", "a4");
-       pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
-       pdf.save("LLM Report.pdf");
-     });
-   };
+  const tableStyle = {
+    border: "1px solid #ccc",
+    width: "100%",
+    textAlign: "left",
+  };
 
-   const tableStyle = {
-     border: "1px solid #ccc",
-     width: "100%",
-     textAlign: "left",
-   };
+  const thStyle = {
+    backgroundColor: "#f2f2f2",
+    padding: "8px",
+  };
 
-   const thStyle = {
-     backgroundColor: "#f2f2f2",
-     padding: "8px",
-   };
+  const mark = {
+    border: "1px solid rgb(225 225 225 / 88%)",
+  };
 
-   
+  const buttonData = {
+    padding: "5px 15px",
+    textAlign: "center",
+    margin: "auto",
+    backgroundColor: "#eceff0",
+  };
 
-   const mark = {
-     border: "1px solid rgb(225 225 225 / 88%)",
-   };
+  const redirect = (key) => {
+    if (key === "LLM Comparison Report" && showGetData === true) {
+      navigate("/llmreportdata", { state: { data: dataItem } });
+    } else if (key === "LLM Comparison Report" && showGetData !== true) {
+      alert("LLM Comparison Report is not Available");
+    }
 
-   const buttonData = {
-     padding: "5px 15px",
-     textAlign: "center",
-     margin: "auto",
-     backgroundColor: "#eceff0",
-   };
+    if (key === "LLM Competitor Report" && showGetData === true) {
+      navigate("/reportdata", { state: { data: dataItem } });
+    } else if (key === "LLM Competitor Report" && showGetData !== true) {
+      alert("LLM Competitor Report is not Available");
+    }
+  };
 
 
   return (
@@ -62,161 +75,15 @@ function ReportingComponent({
                   name=""
                   value=""
                   checked={checkedItemsReport.includes(key)}
-                  onChange={() =>
+                  onChange={() =>{
                     handleCheckBoxChangeReport("Dashboard and Reporting", key)
-                  }
+                    redirect(key);
+                  }}
+                  
                 />{" "}
                 {key}
                 <br />
-                {/*----------------- First Section Comparison Data ---------------------*/}
-                {checkedItemsReport.includes("LLM Comparison Report") &&
-                  key === "LLM Comparison Report" && (
-                    <>
-                      {showGetData ? (
-                        <div className="p-4" ref={tableRef}>
-                          <Table
-                            bordered
-                            responsive
-                            style={tableStyle}
-                            className="mt-3"
-                          >
-                            <thead>
-                              <h4 className="p-3">LLM Comparison Report</h4>
-                              <tr>
-                                {/* <th style={thStyle}>Heading</th> */}
-                                {Object.keys(dataItem).map((name) => (
-                                  <th
-                                    className="text-center"
-                                    key={name}
-                                    style={thStyle}
-                                  >
-                                    {" "}
-                                    {name === "gpt_4"
-                                      ? "GPT4"
-                                      : name === "palm2_text"
-                                      ? "Palm2"
-                                      : name === "llama2_70b_chat"
-                                      ? "LLama2"
-                                      : ""}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                {/* <td
-                                  style={{
-                                    padding: "8px",
-                                    backgroundColor: "white",
-                                  }}
-                                >
-                                  <div style={mark} className="p-3">
-                                    Brand Description
-                                  </div>
-                                </td> */}
-                                {Object.keys(dataItem).map((name) => (
-                                  <td
-                                    key={name}
-                                    style={{
-                                      padding: "8px",
-                                      backgroundColor: "white",
-                                    }}
-                                  >
-                                    <Markdown
-                                      className="markTable p-3"
-                                      style={mark}
-                                    >
-                                      {dataItem[name][0]}
-                                    </Markdown>
-                                  </td>
-                                ))}
-                              </tr>
-                            </tbody>
-                          </Table>
-                          <Button
-                            variant="primary"
-                            className="mt-3 mb-3 d-flex justify-content-center"
-                            onClick={downloadPDF}
-                            style={buttonData}
-                          >
-                            Download PDF
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="p-3">Report is not Available</div>
-                      )}
-                    </>
-                  )}
-                {/*----------------- First Section Comparison Data ---------------------*/}
-                {/*----------------- Second Section Competitor Data ---------------------*/}
-                {checkedItemsReport.includes("LLM Competitor Report") &&
-                  key === "LLM Competitor Report" && (
-                    <>
-                      {showGetData ? (
-                        <div className="p-4" ref={tableRef}>
-                          <Table
-                            bordered
-                            responsive
-                            style={tableStyle}
-                            className="mt-3"
-                          >
-                            <thead>
-                              <h4 className="p-3">LLM Competition Report</h4>
-                              <tr>
-                                {Object.keys(dataItem).map((name) => (
-                                  <th
-                                    className="text-center"
-                                    key={name}
-                                    style={thStyle}
-                                  >
-                                    {" "}
-                                    {name === "gpt_4"
-                                      ? "GPT4"
-                                      : name === "palm2_text"
-                                      ? "Palm2"
-                                      : name === "llama2_70b_chat"
-                                      ? "LLama2"
-                                      : ""}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                {Object.keys(dataItem).map((name) => (
-                                  <td
-                                    key={name}
-                                    style={{
-                                      padding: "8px",
-                                      backgroundColor: "white",
-                                    }}
-                                  >
-                                    <Markdown
-                                      className="markTable p-3"
-                                      style={mark}
-                                    >
-                                      {dataItem[name][0]}
-                                    </Markdown>
-                                  </td>
-                                ))}
-                              </tr>
-                            </tbody>
-                          </Table>
-                          <Button
-                            variant="primary"
-                            className="mt-3 mb-3 d-flex justify-content-center"
-                            onClick={downloadPDF}
-                            style={buttonData}
-                          >
-                            Download PDF
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="p-3">Report is not Available</div>
-                      )}
-                    </>
-                  )}
-                {/*----------------- Second Section Comparison Data ---------------------*/}
+               
               </li>
             ))}
           </ul>

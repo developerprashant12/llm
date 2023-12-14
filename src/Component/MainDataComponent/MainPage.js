@@ -60,7 +60,7 @@ function MainPage() {
   //----------------------------------Dynamic  Data for API-------------------------------//
   //--------------------------------------Select Data-------------------------------------//
   const options = [
-    { name: "GPT-4 (OpenAI)", value: "gpt_4" },
+    { name: "GPT-4 Turbo (OpenAI)", value: "gpt_4_turbo" },
     { name: "Palm2 (Google/Bard)", value: "palm2_text" },
     { name: "Llama2 (Meta)", value: "llama2_70b_chat" },
     { name: "Claude (Anthropic)", value: "Claude" },
@@ -73,6 +73,11 @@ function MainPage() {
   const [againSelectedItems, setAgainSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [dataHistory, setDataHistory] = useState([]);
+  const [checkedItemStore, setCheckedItemStore] = useState([]);
+
+  console.log("checkedItems", checkedItems);
+  console.log("checkedItemStore", checkedItemStore);
+
 
   const copyToClipboard = (text) => {
     navigator.clipboard
@@ -235,7 +240,7 @@ function MainPage() {
       const inputPrompt = `${
         promptBrandKey.length !== 0
           ? `${promptBrandKey}. Please Don't send me incomplete data and Please don't give me any wrong information in response.`
-          : `Please provide me specific data of ${promptData} with ${checkedItems}  ${
+          : `Please provide me specific data related to ${promptData}. In this order, provide ${checkedItems}  ${
               competitors.length !== 0
                 ? "like" + " " + competitors + " " + "competitor"
                 : ""
@@ -243,7 +248,7 @@ function MainPage() {
               promptBrandReach.length !== 0
                 ? "Prompt:" + "" + promptBrandReach
                 : ""
-            } of ${selectedOption}. Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
+            }. Format the data in a bulleted list. Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
             ${
               selectedOption != "Competition"
                 ? `I don't want any data in the table in the response.`
@@ -251,6 +256,24 @@ function MainPage() {
             } ${
               checkedItems.includes("Brand Attributes")
                 ? `If Brand Attributes data is provided, format the data in an unordered list with bullets.`
+                : ""
+            }
+            ${
+              (selectedOption === "Brand Favorability" &&
+                checkedItems.includes(
+                  "Top 5 Positive and Negative Attributes"
+                )) ||
+              checkedItems.includes("Competitor Comparison")
+                ? `Still would like a table for competitor with rows as brand and competitors, and columns as Top 5 positive and negative attributes.`
+                : ""
+            }
+            ${
+              (selectedOption === "Competition" &&
+                checkedItems.includes(
+                  "Top 5 Positive and Negative Attributes"
+                )) ||
+              checkedItems.includes("Competitor Comparison")
+                ? `Still would like a table for competitor with rows as brand and competitors, and columns as Top 5 positive and negative attributes.`
                 : ""
             }
             ${
@@ -266,14 +289,15 @@ function MainPage() {
                 : ""
             }
             ${
+              checkedItems.includes("Sources")
+                ? `Provide a comprehensive list of the sources (at least 10) utilized in your response in a bulleted list separate from your main response`
+                : ""
+            }
+            ${
               checkedItems.includes("Competitive Set")
                 ? `If Competitive Set data is provided, format the data in an unordered list with bullets.`
                 : ""
-            } ${
-              checkedItems.includes("Sources")
-                ? `If asked about data related to Sources, only provide the message: 'Model does not provide accurate source information'. Apart from this message, I don't need anything else in response.`
-                : ""
-            } ${
+            }    ${
               checkedItems.includes("Product Attributes")
                 ? `If Product Attributes data is provided, format the data in an unordered list with bullets.`
                 : ""
@@ -290,11 +314,14 @@ function MainPage() {
         sampling_temperature: 0.7,
         variables: null,
       };
+
+      console.log("DataInput", payload);
+      
       fetch("https://api.gooey.ai/v2/CompareLLM/", {
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-zTzwaAlYWRsj4S72bBft48zmSxnElGnVjCgTZ1X3irf7DiJU",
+          "Bearer sk-MTe772KK8YFMAPFxZCCaYUybg49he6WA8mgLFntIGgLjQRrX",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -303,6 +330,7 @@ function MainPage() {
         .then((data) => {
           if (data && data.output && data.output.output_text != undefined) {
             NotificationManager.success("Launch Successfully", "", 3000);
+            setCheckedItemStore(checkedItems);
             setShowData(false);
             setShowGetData(true);
             setDataItem(data.output.output_text);
@@ -422,7 +450,7 @@ function MainPage() {
       <Container fluid>
         <Container className="border border-secondary-subtle borderSet mt">
           <h4 className="float-start text1">Find Your LLM Benchmark</h4>
-          {/*--------------------- Initial First Section ------------------------*/}
+          {/****************************** Big Initial First Section ******************************/}
           <div className="p-3 mt-5 initialChanges">
             <h5 className="float-start">What would you like to do?</h5>
             <Form.Group as={Col} md="10">
@@ -462,20 +490,20 @@ function MainPage() {
               </Row>
             </Form.Group>
           </div>
-          {/*--------------------- Initial First Section ------------------------*/}
+          {/****************************** Big Initial First Section ******************************/}
 
-          {/*--------------------- Initial Second Section -----------------------*/}
+          {/****************************** Big Initial Second Section ******************************/}
           <div className="p-3">
             <Container className="back">
-              <Form className="form-inline form-quicksearch mx-auto mt-2 p-3">
-                {/*--------------------- Start Section ------------------------*/}
+              <Form className="form-inline form-5yquicksearch mx-auto mt-2 p-3">
+                {/*********************** Small Discover First Section *************************/}
                 {selectedOptionFirstShow === "Discover" && (
                   <Row className="mb-3">
                     <h6 className="float-start text mb-4 mt-4">
                       What Would You Like to Focus On?
                     </h6>
-
-                    {/*----- Show Big Company/Brand First Section ----*/}
+                    {/**************** Very  Small Discover First Section *******************/}
+                    {/*------------------------ Show Big Section ------------------------*/}
                     {selectedOptionShow === "Company/Brand" && (
                       <>
                         <Form.Group as={Col} md="12">
@@ -492,7 +520,25 @@ function MainPage() {
                         </Form.Group>
                       </>
                     )}
-                    {/*------------------Show Big Company/Brand First Section -----------------*/}
+
+                    {selectedOptionShow === "Product" && (
+                      <>
+                        <Form.Group as={Col} md="12">
+                          <Form.Control
+                            as="textarea"
+                            rows={1}
+                            cols={2}
+                            type="text"
+                            name="firstName"
+                            placeholder="Product (input)"
+                            className="big custom-placeholder mt-2"
+                            value={promptData}
+                            onChange={(e) => setPromptData(e.target.value)}
+                          />
+                        </Form.Group>
+                      </>
+                    )}
+                    {/*------------------------ Show Big Section ------------------------*/}
 
                     <Form.Group as={Col} md="12">
                       <Row>
@@ -558,7 +604,7 @@ function MainPage() {
                     )}
                     {/*------------------ Company/Brand Second Section -----------------*/}
 
-                    {/*-------------------------- Product -----------------------*/}
+                    {/*----------------------------- Product ---------------------------*/}
                     {selectedOptionShow === "Product" && (
                       <ProductRadioOptions
                         promptData={promptData}
@@ -567,21 +613,21 @@ function MainPage() {
                         handleRadioSelection={handleRadioSelection}
                       />
                     )}
-                    {/*------------------------- Product ------------------------*/}
+                    {/*----------------------------- Product ---------------------------*/}
 
-                    {/*-------------------------- Key Prompt -----------------------*/}
+                    {/*----------------------------- Key Prompt ------------------------*/}
                     {selectedOptionShow === "Key Prompt" && (
                       <>
                         {/* <Form.Group as={Col} md="6">
-                        <Form.Control
-                          type="text"
-                          name="firstName"
-                          placeholder="Company/Brand/Product"
-                          className="height0 custom-placeholder mb-3"
-                          value={promptBrand}
-                          onChange={(e) => setPromptBrand(e.target.value)}
-                        />
-                      </Form.Group> */}
+                              <Form.Control
+                                type="text"
+                                name="firstName"
+                                placeholder="Company/Brand/Product"
+                                className="height0 custom-placeholder mb-3"
+                                value={promptBrand}
+                                onChange={(e) => setPromptBrand(e.target.value)}
+                              />
+                            </Form.Group> */}
 
                         <Form.Group as={Col} md="12">
                           <Form.Control
@@ -597,8 +643,9 @@ function MainPage() {
                         </Form.Group>
                       </>
                     )}
-                    {/*-------------------------- Key Prompt -----------------------*/}
+                    {/*----------------------------- Key Prompt ------------------------*/}
 
+                    {/*$$$$$$$$$$$$$$$$$$$$$ Inside Data Section $$$$$$$$$$$$$$$$$$$$$$$$*/}
                     {selectedOption === "Brand Overview" && (
                       <OverviewComponent
                         checkedItems={checkedItems}
@@ -618,19 +665,24 @@ function MainPage() {
                         <CategoryDimensions
                           checkedItems={checkedItems}
                           handleCheckBoxChange={handleCheckBoxChange}
+                          handlePromptBrandReachChange={
+                            handlePromptBrandReachChange
+                          }
+                          promptBrandReach={promptBrandReach}
                         />
                       )}
 
-                    {selectedOption === "Brand Reach" && (
-                      <ReachComponent
-                        promptBrandReach={promptBrandReach}
-                        checkedItems={checkedItems}
-                        handlePromptBrandReachChange={
-                          handlePromptBrandReachChange
-                        }
-                        handleCheckBoxChange={handleCheckBoxChange}
-                      />
-                    )}
+                    {selectedOption === "Category Leadership" &&
+                      selectedOptionFirstShow === "Discover" && (
+                        <ReachComponent
+                          promptBrandReach={promptBrandReach}
+                          checkedItems={checkedItems}
+                          handlePromptBrandReachChange={
+                            handlePromptBrandReachChange
+                          }
+                          handleCheckBoxChange={handleCheckBoxChange}
+                        />
+                      )}
 
                     {selectedOption === "Product Representation" && (
                       <RepresentationComponent
@@ -689,6 +741,7 @@ function MainPage() {
                         dataItem={dataItem}
                         againSelectedItems={againSelectedItems}
                         checkedItems={checkedItems}
+                        checkedItemStore={checkedItemStore}
                       />
                     )}
 
@@ -703,17 +756,21 @@ function MainPage() {
                       handleClickShow={handleClickShow}
                       handleClickReset={handleClickReset}
                     />
+                    {/*$$$$$$$$$$$$$$$$$$$$$ Inside Data Section $$$$$$$$$$$$$$$$$$$$$$$$*/}
+
+                    {/**************** Very Small Discover First Section *******************/}
                   </Row>
                 )}
-                {/*--------------------- Start Section ------------------------*/}
-                {/*--------------------- End Section --------------------------*/}
+                {/*********************** Small Discover First Section *************************/}
+
+                {/*********************** Small Discover Second Section ************************/}
                 {selectedOptionFirstShow === "Monitoring" && (
                   <Row className="mb-3">
                     <h6 className="float-start text mb-4 mt-4">
                       What Would You Like to Moniter?
                     </h6>
 
-                    {/*------------------ Show Big Company/Brand First Section -----------------*/}
+                    {/*------------------------ Show Big Section ------------------------*/}
                     {selectedOptionShow === "Company/Brand" && (
                       <>
                         <Form.Group as={Col} md="12">
@@ -730,7 +787,25 @@ function MainPage() {
                         </Form.Group>
                       </>
                     )}
-                    {/*------------------Show Big Company/Brand First Section -----------------*/}
+
+                    {selectedOptionShow === "Product" && (
+                      <>
+                        <Form.Group as={Col} md="12">
+                          <Form.Control
+                            as="textarea"
+                            rows={1}
+                            cols={2}
+                            type="text"
+                            name="firstName"
+                            placeholder="Product (input)"
+                            className="big custom-placeholder mt-2"
+                            value={promptData}
+                            onChange={(e) => setPromptData(e.target.value)}
+                          />
+                        </Form.Group>
+                      </>
+                    )}
+                    {/*------------------------ Show Big Section ------------------------*/}
 
                     <Form.Group as={Col} md="12">
                       <Row>
@@ -895,8 +970,10 @@ function MainPage() {
                         </Form.Group>
                       </>
                     )}
-                    {/*-------------------------- Key Prompt -----------------------*/}
 
+                    {/*-------------------------- Key Prompt -----------------------*/}
+                    {/**************** Very Small Discover First Section *******************/}
+                    {/*$$$$$$$$$$$$$$$$$$$$$ Inside Data Section $$$$$$$$$$$$$$$$$$$$$$$$*/}
                     {selectedOption === "Brand Overview" && (
                       <MOverviewComponent
                         checkedItems={checkedItems}
@@ -911,24 +988,29 @@ function MainPage() {
                       />
                     )}
 
-                    {selectedOption === "Brand Category Dimensions" &&
+                    {selectedOption === "                                                                                                                                                                                                                                                            " &&
                       selectedOptionShow === "Company/Brand" && (
                         <MCategoryDimensions
                           checkedItems={checkedItems}
                           handleCheckBoxChange={handleCheckBoxChange}
+                          handlePromptBrandReachChange={
+                            handlePromptBrandReachChange
+                          }
+                          promptBrandReach={promptBrandReach}
                         />
                       )}
 
-                    {selectedOption === "Brand Reach" && (
-                      <MReachComponent
-                        promptBrandReach={promptBrandReach}
-                        checkedItems={checkedItems}
-                        handlePromptBrandReachChange={
-                          handlePromptBrandReachChange
-                        }
-                        handleCheckBoxChange={handleCheckBoxChange}
-                      />
-                    )}
+                    {selectedOption === "Brand Reach" &&
+                      selectedOptionFirstShow === "Monitoring" && (
+                        <MReachComponent
+                          promptBrandReach={promptBrandReach}
+                          checkedItems={checkedItems}
+                          handlePromptBrandReachChange={
+                            handlePromptBrandReachChange
+                          }
+                          handleCheckBoxChange={handleCheckBoxChange}
+                        />
+                      )}
 
                     {selectedOption === "Competition" &&
                       selectedOptionShow === "Company/Brand" && (
@@ -998,6 +1080,7 @@ function MainPage() {
                           dataItem={dataItem}
                           againSelectedItems={againSelectedItems}
                           checkedItems={checkedItems}
+                          checkedItemStore={checkedItemStore}
                         />
                       )}
 
@@ -1012,9 +1095,11 @@ function MainPage() {
                       handleClickShow={handleClickShow}
                       handleClickReset={handleClickReset}
                     />
+                    {/*$$$$$$$$$$$$$$$$$$$$$ Inside Data Section $$$$$$$$$$$$$$$$$$$$$$$$*/}
+                    {/**************** Very Small Discover First Section *******************/}
                   </Row>
                 )}
-                {/*--------------------- End Section --------------------------*/}
+                {/*********************** Small Discover Second Section ************************/}
               </Form>
             </Container>
             {/*-------------------- Data Display Section --------------------*/}
@@ -1026,7 +1111,7 @@ function MainPage() {
             )}
             {/*-------------------- Data Display Section --------------------*/}
           </div>
-          {/*------------------- Initial Second Section ------------------------*/}
+          {/****************************** Big Initial Second Section ******************************/}
         </Container>
 
         <ChatComponent

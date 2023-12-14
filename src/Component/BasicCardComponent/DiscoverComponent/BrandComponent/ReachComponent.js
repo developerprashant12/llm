@@ -13,7 +13,7 @@ function ReachComponent({
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
         <Card.Body>
-          <Card.Title className="">Brand Reach</Card.Title>
+          <Card.Title className="">Category Leadership</Card.Title>
           <Card.Text>
             <ul className="focus-on mt-4">
               <li>
@@ -22,7 +22,7 @@ function ReachComponent({
                     as="textarea"
                     rows={1}
                     cols={2}
-                    placeholder="Enter the Prompt"
+                    placeholder="Enter Brand Category"
                     name="promptBrandReach"
                     value={promptBrandReach}
                     onChange={handlePromptBrandReachChange}
@@ -33,7 +33,11 @@ function ReachComponent({
             </ul>
           </Card.Text>
           <ul className="focus-on">
-            {["Responses", "Sources"].map((key) => (
+            {[
+              "Top 5 Brands/Products in Category (choose 1)",
+              "Best Brands/Products in Category (choose 1)",
+              "Sources",
+            ].map((key) => (
               <li key={key}>
                 <input
                   type="checkbox"
