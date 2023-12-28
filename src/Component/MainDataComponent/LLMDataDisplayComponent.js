@@ -10,12 +10,75 @@ import {
 
 const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirstShow }) => {
   const [dataHistory, setDataHistory] = useState([]);
-  const [dataHistory1, setDataHistory1] = useState([]);
   const alertShownRef = useRef(false);
   const [editedData, setEditedData] = useState(null);
 
   //--------------------- Match Notification Data ---------------------//
+  useEffect(() => {
+    if (dataHistory.length > 1) {
+      const test = [];
+      const test1 = [];
+      const test2 = [];
+      
+      dataHistory.forEach((item, index) => {
+        const data = JSON.parse(item.data);
+  
+        // Check if the properties exist and are arrays before accessing index 0
+        if (data.palm2_text && Array.isArray(data.palm2_text) && data.palm2_text.length > 0) {
+          test.push(data.palm2_text[0]);
+        }
+  
+        if (data.gpt_4_turbo && Array.isArray(data.gpt_4_turbo) && data.gpt_4_turbo.length > 0) {
+          test1.push(data.gpt_4_turbo[0]);
+        }
+  
+        if (data.llama2_70b_chat && Array.isArray(data.llama2_70b_chat) && data.llama2_70b_chat.length > 0) {
+          test2.push(data.llama2_70b_chat[0]);
+        }
+  
+        const dataItemData = data.palm2_text + data.gpt_4_turbo + data.llama2_70b_chat;
+      });
+  
+      const allValues = test.concat(test1, test2).join('\n\n');
+  
+      const payloadData = {
+        input_prompt: "Please make me a short summary of this data in which all the information of my data should be included in that summary. :- " + " " + allValues,
+        selected_models: ["gpt_4"],
+        avoid_repetition: false,
+        num_outputs: 1,
+        quality: 1,
+        sampling_temperature: 0.7,
+        variables: null,
+      };
+  
+      fetch("https://api.gooey.ai/v2/CompareLLM/", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer sk-XnkmQiv9OI6pJTxKiCG8BWI31y7T0CmFDyIwaAiDPIOlO4Om",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payloadData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Summarize Data:", data);
+        });
+    }
+  }, [dataHistory]);
+  
 
+  //--- Cleanup alert show again ----//
+  useEffect(() => {
+    return () => {
+      alertShownRef.current = false;
+    };
+  }, []);
+  //--- Cleanup alert show again ----//
+
+  //--------------------- Match Notification Data ---------------------//
+  const handleEditData = (data) => {
+    setEditedData(JSON.parse(data));
+  };
 
   useEffect(() => {
     fetchDataFromFirebase((data) => {
@@ -29,53 +92,6 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
       setDataHistory(last10Items);
     });
   }, []);
-
- 
-  useEffect(() => {
-    if (dataHistory.length > 1) {
-      const test = [];
-      const test1 = [];
-      const test2 = [];
-      dataHistory.forEach((item, index) => {
-      const data = JSON.parse(item.data);
-        test.push(data.palm2_text[0])
-        test1.push(data.gpt_4_turbo[0])
-        test2.push(data.llama2_70b_chat[0])
-       const dataItemData = data.palm2_text + data.gpt_4_turbo + data.llama2_70b_chat
-      });
-      const allValues = test.concat(test1, test2).join('\n\n');
-      const payloadData = {
-          input_prompt: "Please make me a short summary of this data in which all the information of my data should be included in that summary. :- " + " " + allValues ,     
-          selected_models: ["gpt_4"],
-          avoid_repetition: false,
-          num_outputs: 1,
-          quality: 1,
-          sampling_temperature: 0.7,
-          variables: null,
-        };
-  
-        fetch("https://api.gooey.ai/v2/CompareLLM/", {
-          method: "POST",
-          headers: {
-            Authorization:
-            "Bearer sk-XnkmQiv9OI6pJTxKiCG8BWI31y7T0CmFDyIwaAiDPIOlO4Om",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payloadData),
-        })
-          .then((response) => response.json())
-          .then((data)=>{
-            console.log("Sumarize Data :",data)
-          })
-    }
-  }, [dataHistory]);
-
-  //--------------------- Match Notification Data ---------------------//
-
-
-  const handleEditData = (data) => {
-    setEditedData(JSON.parse(data));
-  };
 
 
   // Function to group data by date
