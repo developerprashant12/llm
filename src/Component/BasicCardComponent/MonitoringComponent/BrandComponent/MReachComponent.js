@@ -13,7 +13,7 @@ function MReachComponent({
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
         <Card.Body>
-          <Card.Title className="">Brand Reach</Card.Title>
+          <Card.Title className="">Category Leadership</Card.Title>
           <Card.Text>
             {/* <ul className="focus-on mt-4">
                                 <li>
@@ -33,7 +33,7 @@ function MReachComponent({
                               </ul> */}
           </Card.Text>
           <ul className="focus-on">
-            {["Mentions", "Ranking"].map((key) => (
+            {["Mention, ranking, and descriptions to key prompts"].map((key) => (
               <li key={key}>
                 <input
                   type="checkbox"

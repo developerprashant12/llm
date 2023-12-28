@@ -1,17 +1,23 @@
-import React,{useRef} from 'react'
-import {
-  Table,
-  Button,
-} from "react-bootstrap";
+import React, { useRef } from "react";
+import { Table, Button } from "react-bootstrap";
 import Markdown from "markdown-to-jsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useLocation } from "react-router-dom";
 
 function ComparisonReportingComponent() {
-  const location = useLocation();
-  const dataItem = location.state && location.state.data;
   const tableRef = useRef(null);
+  const location = useLocation();
+  console.log(location);
+  const urlSearchParams = new URLSearchParams(location.search);
+  const dataParam = urlSearchParams.get("data");
+  const dataItem = dataParam ? JSON.parse(dataParam) : null;
+  const checkedItemStoreParam = urlSearchParams.get("checkedItemStore")
+ 
+
+  const checkedItemStore = checkedItemStoreParam ? checkedItemStoreParam.split(',') : [];
+
+  console.log(checkedItemStore);
 
   const downloadPDF = () => {
     const input = tableRef.current;
@@ -24,7 +30,7 @@ function ComparisonReportingComponent() {
   };
 
   const tableStyle = {
-    border: "1px solid #ccc",
+    border: "1px solid rgb(133 111 111)",
     width: "100%",
     textAlign: "left",
   };
@@ -35,75 +41,92 @@ function ComparisonReportingComponent() {
   };
 
   const mark = {
-    border: "1px solid rgb(225 225 225 / 88%)",
+    border: "1px solid rgb(120 111 111 / 88%)",
   };
 
   const buttonData = {
     padding: "5px 15px",
     textAlign: "center",
     margin: "auto",
-    backgroundColor: "#eceff0",
+    backgroundColor: "rgb(97 107 108)",
+    color: "white",
   };
+  const borderData = {
+    borderBottom: "1px solid #8f8080",
+    borderTop: "0px",
+    borderLeft: "0px",
+    borderRight: "0px",
+    marginBottom: "40px",
+  };
+
+  const extractSections = (content) => {
+    const regexPattern = new RegExp(
+      `(?<=${checkedItemStore.join("|")}:)(.*?)(?=${checkedItemStore
+        .slice(1)
+        .join("|")}:|$)`,
+      "gs"
+    );
+
+    const matches = content.matchAll(regexPattern);
+
+    const sectionsData = checkedItemStore.map(() => {
+      const match = matches.next().value;
+      const data = match && match[1] ? match[1].trim() : "";
+      return data;
+    });
+    return sectionsData;
+  };
+
   return (
     <div>
-        <div className="p-4" ref={tableRef}>
-          <Table bordered responsive style={tableStyle} className="mt-3">
-            <thead>
-              <h4 className="p-3">LLM Comparison Report</h4>
-              <tr>
-                {/* <th style={thStyle}>Heading</th> */}
-                {Object.keys(dataItem).map((name) => (
-                  <th className="text-center" key={name} style={thStyle}>
-                    {" "}
-                    {name === "gpt_4"
-                      ? "GPT4"
-                      : name === "palm2_text"
-                      ? "Palm2"
-                      : name === "llama2_70b_chat"
-                      ? "LLama2"
-                      : ""}
-                  </th>
-                ))}
+      <h1 className="text-center pt-3">LLM Report Data</h1>
+      <div className="p-4" ref={tableRef}>
+        <Table bordered responsive style={tableStyle} className="mt-3">
+          <thead>
+            <h4 className="p-3">LLM Comparison Report</h4>
+            <tr>
+              <th className="text-center" style={thStyle}>
+                Source
+              </th>
+
+              {Object.keys(dataItem).map((name) => (
+                <th className="text-center" key={name} style={thStyle}>
+                  {" "}
+                  {name === "gpt_4_turbo"
+                    ? "GPT4 Turbo"
+                    : name === "palm2_text"
+                    ? "Palm2"
+                    : name === "llama2_70b_chat"
+                    ? "Llama2"
+                    : ""}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {checkedItemStore.map((dataType, index) => (
+              <tr key={index}>
+                <td>{dataType}</td>
+                {Object.keys(dataItem).map((source) => {
+                  
+                  const sectionsData = extractSections(dataItem[source][0]);
+                  console.log("sectionsData",sectionsData);
+                  const data = sectionsData[index] || "";
+                  return <td key={source}>{data}</td>;
+                })}
               </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {/* <td
-                                  style={{
-                                    padding: "8px",
-                                    backgroundColor: "white",
-                                  }}
-                                >
-                                  <div style={mark} className="p-3">
-                                    Brand Description
-                                  </div>
-                                </td> */}
-                {Object.keys(dataItem).map((name) => (
-                  <td
-                    key={name}
-                    style={{
-                      padding: "8px",
-                      backgroundColor: "white",
-                    }}
-                  >
-                    <Markdown className="markTable p-3" style={mark}>
-                      {dataItem[name][0]}
-                    </Markdown>
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </Table>
-          <Button
-            variant="primary"
-            className="mt-3 mb-3 d-flex justify-content-center"
-            onClick={downloadPDF}
-            style={buttonData}
-          >
-            Download PDF
-          </Button>
-        </div>
-      
+            ))}
+          </tbody>
+        </Table>
+        <Button
+          variant="primary"
+          className="mt-3 mb-3 d-flex justify-content-center"
+          onClick={downloadPDF}
+          style={buttonData}
+        >
+          Download PDF
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 import { Row, Col, Card, Container } from "react-bootstrap";
 import Markdown from "markdown-to-jsx";
 import {
@@ -6,18 +8,13 @@ import {
   deleteDataFromFirebase,
 } from "../../DatabaseFirebase/firebaseService";
 
-const LLMDataDisplayComponent = ({ dataItem, copyToClipboard }) => {
+const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirstShow }) => {
   const [dataHistory, setDataHistory] = useState([]);
+  const [dataHistory1, setDataHistory1] = useState([]);
   const alertShownRef = useRef(false);
   const [editedData, setEditedData] = useState(null);
 
-console.log("editedData", editedData);
-console.log("dataItem", dataItem);
-
-
-  const handleEditData = (data) => {
-    setEditedData(JSON.parse(data));
-  };
+  //--------------------- Match Notification Data ---------------------//
 
 
   useEffect(() => {
@@ -26,11 +23,60 @@ console.log("dataItem", dataItem);
         key,
         ...value,
       }));
-      setDataHistory(arrayOfObjects);
+
+    //---------- Get the last 10 items
+    const last10Items = arrayOfObjects.slice(-10);
+      setDataHistory(last10Items);
     });
   }, []);
 
+ 
+  useEffect(() => {
+    if (dataHistory.length > 1) {
+      const test = [];
+      const test1 = [];
+      const test2 = [];
+      dataHistory.forEach((item, index) => {
+      const data = JSON.parse(item.data);
+        test.push(data.palm2_text[0])
+        test1.push(data.gpt_4_turbo[0])
+        test2.push(data.llama2_70b_chat[0])
+       const dataItemData = data.palm2_text + data.gpt_4_turbo + data.llama2_70b_chat
+      });
+      const allValues = test.concat(test1, test2).join('\n\n');
+      const payloadData = {
+          input_prompt: "Please make me a short summary of this data in which all the information of my data should be included in that summary. :- " + " " + allValues ,     
+          selected_models: ["gpt_4"],
+          avoid_repetition: false,
+          num_outputs: 1,
+          quality: 1,
+          sampling_temperature: 0.7,
+          variables: null,
+        };
   
+        fetch("https://api.gooey.ai/v2/CompareLLM/", {
+          method: "POST",
+          headers: {
+            Authorization:
+            "Bearer sk-XnkmQiv9OI6pJTxKiCG8BWI31y7T0CmFDyIwaAiDPIOlO4Om",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payloadData),
+        })
+          .then((response) => response.json())
+          .then((data)=>{
+            console.log("Sumarize Data :",data)
+          })
+    }
+  }, [dataHistory]);
+
+  //--------------------- Match Notification Data ---------------------//
+
+
+  const handleEditData = (data) => {
+    setEditedData(JSON.parse(data));
+  };
+
 
   // Function to group data by date
   const groupDataByDate = (data) => {
@@ -44,7 +90,7 @@ console.log("dataItem", dataItem);
     }, {});
   };
 
-  // Grouping data by date
+  //---------------- Grouping data by date ----------------//
   const groupedDataByDate = groupDataByDate(dataHistory);
 
   const isToday = (date) => {
@@ -74,11 +120,11 @@ console.log("dataItem", dataItem);
     } else if (isYesterday(date)) {
       return "Yesterday";
     } else {
-      return date;
+      return "Previous";
     }
   };
 
-  // Sorting dates in descending order
+  //-------------- Sorting dates in descending order ----------------//
   const sortedDates = Object.keys(groupedDataByDate).sort((a, b) => {
     const dateA = new Date(a);
     const dateB = new Date(b);
@@ -257,6 +303,7 @@ console.log("dataItem", dataItem);
           </Container>
         </Card>
       </Col>
+      <NotificationContainer/>
     </Row>
   );
 };

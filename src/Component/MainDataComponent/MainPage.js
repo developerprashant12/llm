@@ -19,6 +19,7 @@ import MPFavorabilityComponent from "../BasicCardComponent/MonitoringComponent/P
 import MPReachComponent from "../BasicCardComponent/MonitoringComponent/ProductComponent/MPReachComponent";
 import MBrandCompetition from "../BasicCardComponent/MonitoringComponent/BrandComponent/MBrandCompetition";
 import MProductCompetition from "../BasicCardComponent/MonitoringComponent/ProductComponent/MProductCompetition";
+import POverviewComponent from "../BasicCardComponent/DiscoverComponent/ProductComponent/POverviewComponent";
 import LLMDataDisplayComponent from "./LLMDataDisplayComponent";
 import LLMSelectionComponent from "./LLMSelectionComponent ";
 import "../../App.css";
@@ -27,12 +28,15 @@ import {
   NotificationContainer,
   NotificationManager,
 } from "react-notifications";
+import 'react-notifications/lib/notifications.css';
 import ChatComponent from "./ChatComponent";
 import CustomNavbar from "./Navbar";
 import BrandRadioOptions from "./BrandRadioOptions";
 import ProductRadioOptions from "./ProductRadioOptions";
 import firebaseApp from "../../DatabaseFirebase/Firebase";
 import { getDatabase, ref, push } from "firebase/database";
+import MBrandRadioOptions from "./MBrandRadioOptions";
+import MProductRadioOptions from "./MProductRadioOptions";
 
 function MainPage() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -42,6 +46,7 @@ function MainPage() {
   const [selectedOptionFirstShow, setSelectedOptionFirstShow] =
     useState("Discover");
   const [selectedOptionSecondShow, setSelectedOptionSecondShow] = useState("");
+  const [selectedOptionthirdShow, setSelectedOptionthirdShow] = useState("");
   const [selectedDotShow, setSelectedDotShow] = useState("Input key Prompt :");
   const [showData, setShowData] = useState(false);
   const [showGetData, setShowGetData] = useState(false);
@@ -51,6 +56,7 @@ function MainPage() {
   const [inputValue, setInputValue] = useState("");
   const [competitors, setCompetitors] = useState([]);
   const [promptBrandReach, setPromptBrandReach] = useState("");
+  const [promptBrandReach1, setPromptBrandReach1] = useState("");
   //----------------------------------Dynamic  Data for API-------------------------------//
   const [promptData, setPromptData] = useState("");
   const [promptBrand, setPromptBrand] = useState("");
@@ -75,15 +81,16 @@ function MainPage() {
   const [dataHistory, setDataHistory] = useState([]);
   const [checkedItemStore, setCheckedItemStore] = useState([]);
 
-  console.log("checkedItems", checkedItems);
-  console.log("checkedItemStore", checkedItemStore);
+  // console.log("checkedItems", checkedItems);
+  // console.log("checkedItemStore", checkedItemStore);
 
 
   const copyToClipboard = (text) => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        alert("Text copied to clipboard");
+        // alert("Text copied to clipboard");
+        NotificationManager.success("Text copied to clipboard", "", 3000);
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
@@ -185,6 +192,8 @@ function MainPage() {
     setShowCheckBoxData(false);
     setCompetitors("");
     setPromptBrandReach("");
+    setPromptBrandReach1("");
+
   };
 
   const handleRadioSectionShow = (option) => {
@@ -194,6 +203,7 @@ function MainPage() {
     setShowCheckBoxData(false);
     setCompetitors("");
     setPromptBrandReach("");
+    setPromptBrandReach1("");
     setAgainSelectedItems([]);
     setSelectedItems({});
     setSelectedOption(null);
@@ -209,6 +219,7 @@ function MainPage() {
     setShowCheckBoxData(false);
     setCompetitors("");
     setPromptBrandReach("");
+    setPromptBrandReach1("");
     setAgainSelectedItems([]);
     setSelectedItems({});
     setSelectedOption(null);
@@ -220,6 +231,10 @@ function MainPage() {
 
   const handleRadioSectionSecondShow = (option) => {
     setSelectedOptionSecondShow(option);
+  };
+
+  const handleRadioSectionthirdShow = (option) => {
+    setSelectedOptionthirdShow(option);
   };
 
   const handleDotShow = (option) => {
@@ -237,72 +252,66 @@ function MainPage() {
       setShowData(true);
       setShowGetData(false);
 
-      const inputPrompt = `${
-        promptBrandKey.length !== 0
-          ? `${promptBrandKey}. Please Don't send me incomplete data and Please don't give me any wrong information in response.`
-          : `Please provide me specific data related to ${promptData}. In this order, provide ${checkedItems}  ${
-              competitors.length !== 0
-                ? "like" + " " + competitors + " " + "competitor"
-                : ""
-            } ${
-              promptBrandReach.length !== 0
-                ? "Prompt:" + "" + promptBrandReach
-                : ""
-            }. Format the data in a bulleted list. Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
-            ${
-              selectedOption != "Competition"
-                ? `I don't want any data in the table in the response.`
-                : ""
-            } ${
-              checkedItems.includes("Brand Attributes")
-                ? `If Brand Attributes data is provided, format the data in an unordered list with bullets.`
-                : ""
-            }
-            ${
-              (selectedOption === "Brand Favorability" &&
-                checkedItems.includes(
-                  "Top 5 Positive and Negative Attributes"
-                )) ||
-              checkedItems.includes("Competitor Comparison")
-                ? `Still would like a table for competitor with rows as brand and competitors, and columns as Top 5 positive and negative attributes.`
-                : ""
-            }
-            ${
-              (selectedOption === "Competition" &&
-                checkedItems.includes(
-                  "Top 5 Positive and Negative Attributes"
-                )) ||
-              checkedItems.includes("Competitor Comparison")
-                ? `Still would like a table for competitor with rows as brand and competitors, and columns as Top 5 positive and negative attributes.`
-                : ""
-            }
-            ${
-              selectedOption === "Competition"
-                ? `Create a table that has the following. Company Name as the first column with the companies of ${
-                    (promptData, competitors)
-                  } at the rows, and company description as the second column. The top 5 positive attributes as the third column in that table, and the Top 5 negative attributes as the 4th column in the table. Please list all attributes as concise bullet points within each table cell.`
-                : ""
-            }
-            ${
-              checkedItems.includes("Competitor Comparison")
-                ? `I don't want the response of competitor comparison in percentage.`
-                : ""
-            }
-            ${
-              checkedItems.includes("Sources")
-                ? `Provide a comprehensive list of the sources (at least 10) utilized in your response in a bulleted list separate from your main response`
-                : ""
-            }
-            ${
-              checkedItems.includes("Competitive Set")
-                ? `If Competitive Set data is provided, format the data in an unordered list with bullets.`
-                : ""
-            }    ${
-              checkedItems.includes("Product Attributes")
-                ? `If Product Attributes data is provided, format the data in an unordered list with bullets.`
-                : ""
-            }`
-      }`.replace(/\s+/g, " ");
+      const inputPrompt = `${promptBrandKey.length !== 0
+        ? `${promptBrandKey}. Please Don't send me incomplete data and Please don't give me any wrong information in response.`
+        : `Please provide me specific data related to ${promptBrandReach1 ? promptBrandReach1 : promptData}. In this order, provide ${checkedItems}  ${competitors.length !== 0
+          ? "like" + " " + competitors + " " + "competitor"
+          : ""
+        } ${promptBrandReach.length !== 0
+          ? "Prompt:" + "" + promptBrandReach
+          : ""
+        }. Format the data in a bulleted list. Do not send me data related to words like 'Sure and I hope'. I don't want any unnecessary response to this or Don't send me incomplete data and Please don't give me any wrong information in response. 
+            ${selectedOption != "Competition"
+          ? `I don't want any data in the table in the response.`
+          : ""
+        } ${checkedItems.includes("Brand Attributes")
+          ? `If Brand Attributes data is provided, format the data in an unordered list with bullets.`
+          : ""
+        }
+            ${(selectedOption === "Brand Favorability" &&
+          checkedItems.includes(
+            "Top 5 Positive and Negative Attributes"
+          )) ||
+          checkedItems.includes("Competitor Comparison")
+          ? `Still would like a table for competitor with rows as brand and competitors, and columns as Top 5 positive and negative attributes.`
+          : ""
+        }
+            ${(selectedOption === "Competition" &&
+          checkedItems.includes(
+            "Top 5 Positive and Negative Attributes"
+          )) ||
+          checkedItems.includes("Competitor Comparison")
+          ? `Still would like a table for competitor with rows as brand and competitors, and columns as Top 5 positive and negative attributes.`
+          : ""
+        }
+            ${selectedOption === "Competition"
+          ? `Create a table that has the following. Company Name as the first column with the companies of ${(promptData, competitors)
+          } at the rows, and company description as the second column. The top 5 positive attributes as the third column in that table, and the Top 5 negative attributes as the 4th column in the table. Please list all attributes as concise bullet points within each table cell.`
+          : ""
+        }
+
+            
+
+            ${checkedItems.includes("Competitor Comparison")
+          ? `I don't want the response of competitor comparison in percentage.`
+          : ""
+        }
+            ${checkedItems.includes("Sources")
+          ? `Provide a comprehensive list of the sources (at least 10) utilized in your response in a bulleted list separate from your main response`
+          : ""
+        }
+            ${checkedItems.includes("Competitive Set")
+          ? `If Competitive Set data is provided, format the data in an unordered list with bullets.`
+          : ""
+        }    ${checkedItems.includes("Product Attributes")
+          ? `If Product Attributes data is provided, format the data in an unordered list with bullets.`
+          : ""
+        }
+            ${selectedOptionFirstShow === "Monitoring" && selectedOptionSecondShow
+          ? `Please give me data on ${selectedOptionSecondShow} base.`
+          : ""
+        }`
+        }`.replace(/\s+/g, " ");
 
       const payload = {
         input_prompt: inputPrompt,
@@ -315,13 +324,13 @@ function MainPage() {
         variables: null,
       };
 
-      console.log("DataInput", payload);
-      
+      // console.log("DataInput", payload);
+
       fetch("https://api.gooey.ai/v2/CompareLLM/", {
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-MTe772KK8YFMAPFxZCCaYUybg49he6WA8mgLFntIGgLjQRrX",
+          "Bearer sk-XnkmQiv9OI6pJTxKiCG8BWI31y7T0CmFDyIwaAiDPIOlO4Om",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -368,7 +377,7 @@ function MainPage() {
             NotificationManager.error(
               "Doh! You need to purchase additional credits to run more Gooey.AI recipes: https://gooey.ai/account",
               "",
-              3000
+              5000
             );
             setShowData(false);
           }
@@ -441,6 +450,11 @@ function MainPage() {
     setPromptBrandReach(e.target.value);
   };
 
+  const handlePromptBrandReachChange1 = (e) => {
+    setPromptBrandReach1(e.target.value);
+    // console.log("dadasfafaf", e.target.value)
+  };
+
   return (
     <div className="">
       <CustomNavbar
@@ -459,11 +473,10 @@ function MainPage() {
                   <Col md="2">
                     <li style={{ cursor: "pointer" }}>
                       <a
-                        className={`nav-link ${
-                          selectedOptionFirstShow === "Discover"
-                            ? "active cursor-pointer"
-                            : ""
-                        }`}
+                        className={`nav-link ${selectedOptionFirstShow === "Discover"
+                          ? "active cursor-pointer"
+                          : ""
+                          }`}
                         onClick={() => handleRadioSectionFirstShow("Discover")}
                       >
                         <span></span> Discover
@@ -473,11 +486,10 @@ function MainPage() {
                   <Col md="2">
                     <li style={{ cursor: "pointer" }}>
                       <a
-                        className={`nav-link ${
-                          selectedOptionFirstShow === "Monitoring"
-                            ? "active cursor-pointer"
-                            : ""
-                        }`}
+                        className={`nav-link ${selectedOptionFirstShow === "Monitoring"
+                          ? "active cursor-pointer"
+                          : ""
+                          }`}
                         onClick={() =>
                           handleRadioSectionFirstShow("Monitoring")
                         }
@@ -546,11 +558,10 @@ function MainPage() {
                           <Col md="2">
                             <li style={{ cursor: "pointer" }}>
                               <a
-                                className={`nav-link ${
-                                  selectedOptionShow === "Company/Brand"
-                                    ? "active cursor-pointer"
-                                    : ""
-                                }`}
+                                className={`nav-link ${selectedOptionShow === "Company/Brand"
+                                  ? "active cursor-pointer"
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleRadioSectionShow("Company/Brand")
                                 }
@@ -562,11 +573,10 @@ function MainPage() {
                           <Col md="auto">
                             <li style={{ cursor: "pointer" }}>
                               <a
-                                className={`nav-link ${
-                                  selectedOptionShow === "Product"
-                                    ? "active cursor-pointer"
-                                    : ""
-                                }`}
+                                className={`nav-link ${selectedOptionShow === "Product"
+                                  ? "active cursor-pointer"
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleRadioSectionShow("Product")
                                 }
@@ -578,11 +588,10 @@ function MainPage() {
                           <Col md="2">
                             <li style={{ cursor: "pointer" }}>
                               <a
-                                className={`nav-link ${
-                                  selectedOptionShow === "Key Prompt"
-                                    ? "active cursor-pointer"
-                                    : ""
-                                }`}
+                                className={`nav-link ${selectedOptionShow === "Key Prompt"
+                                  ? "active cursor-pointer"
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleRadioSectionShow("Key Prompt")
                                 }
@@ -665,21 +674,41 @@ function MainPage() {
                         <CategoryDimensions
                           checkedItems={checkedItems}
                           handleCheckBoxChange={handleCheckBoxChange}
-                          handlePromptBrandReachChange={
-                            handlePromptBrandReachChange
+                          handlePromptBrandReachChange1={
+                            handlePromptBrandReachChange1
                           }
-                          promptBrandReach={promptBrandReach}
+                          promptBrandReach1={promptBrandReach1}
                         />
                       )}
 
                     {selectedOption === "Category Leadership" &&
                       selectedOptionFirstShow === "Discover" && (
                         <ReachComponent
-                          promptBrandReach={promptBrandReach}
+                          promptBrandReach1={promptBrandReach1}
                           checkedItems={checkedItems}
-                          handlePromptBrandReachChange={
-                            handlePromptBrandReachChange
+                          handlePromptBrandReachChange1={
+                            handlePromptBrandReachChange1
                           }
+                          handleCheckBoxChange={handleCheckBoxChange}
+                        />
+                      )}
+
+
+                    {selectedOption === "Product Overview" && (
+                      <POverviewComponent
+                        checkedItems={checkedItems}
+                        handleCheckBoxChange={handleCheckBoxChange}
+                      />
+                    )}
+
+                    {selectedOption === "Competition" &&
+                      selectedOptionShow === "Company/Brand" && (
+                        <BrandCompetition
+                          showCheckBoxData={showCheckBoxData}
+                          competitors={competitors}
+                          checkedItems={checkedItems}
+                          handleCheckBoxData={handleCheckBoxData}
+                          handleCompetitorChange={handleCompetitorChange}
                           handleCheckBoxChange={handleCheckBoxChange}
                         />
                       )}
@@ -708,18 +737,6 @@ function MainPage() {
                         handleCheckBoxChange={handleCheckBoxChange}
                       />
                     )}
-
-                    {selectedOption === "Competition" &&
-                      selectedOptionShow === "Company/Brand" && (
-                        <BrandCompetition
-                          showCheckBoxData={showCheckBoxData}
-                          competitors={competitors}
-                          checkedItems={checkedItems}
-                          handleCheckBoxData={handleCheckBoxData}
-                          handleCompetitorChange={handleCompetitorChange}
-                          handleCheckBoxChange={handleCheckBoxChange}
-                        />
-                      )}
 
                     {selectedOption === "Competition" &&
                       selectedOptionShow === "Product" && (
@@ -766,9 +783,15 @@ function MainPage() {
                 {/*********************** Small Discover Second Section ************************/}
                 {selectedOptionFirstShow === "Monitoring" && (
                   <Row className="mb-3">
-                    <h6 className="float-start text mb-4 mt-4">
-                      What Would You Like to Moniter?
-                    </h6>
+
+                    {
+                      selectedOptionShow != "Key Prompt" && (
+                        <h6 className="float-start text mt-4">
+                          What Would You Like to Moniter?
+                        </h6>
+                      )
+                    }
+
 
                     {/*------------------------ Show Big Section ------------------------*/}
                     {selectedOptionShow === "Company/Brand" && (
@@ -807,17 +830,68 @@ function MainPage() {
                     )}
                     {/*------------------------ Show Big Section ------------------------*/}
 
+
+                    {
+                      selectedOptionShow != "Key Prompt" && (
+                        <>
+                          <h6 className="float-start mt-5 mb-3">
+                            What is your basis of comparison?
+                          </h6>
+                          <Form.Group as={Col} md="10" className="topData">
+                            <Row>
+                              <ul className="nav brand-tabs">
+                                <Col md="2">
+                                  <li style={{ cursor: "pointer" }}>
+                                    <a
+                                      className={`nav-link ${selectedOptionthirdShow === "Historical"
+                                        ? "active cursor-pointer"
+                                        : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleRadioSectionthirdShow("Historical")
+                                      }
+                                    >
+                                      <span></span> Historical
+                                    </a>
+                                  </li>
+                                </Col>
+                                <Col md="4">
+                                  <li style={{ cursor: "pointer" }}>
+                                    <a
+                                      className={`nav-link ${selectedOptionthirdShow === "Company Brand Attributes"
+                                        ? "active cursor-pointer"
+                                        : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleRadioSectionthirdShow("Company Brand Attributes")
+                                      }
+                                    >
+                                      <span></span> Company Brand Attributes
+                                    </a>
+                                  </li>
+                                </Col>
+                              </ul>
+                            </Row>
+                          </Form.Group>
+                        </>
+                      )
+                    }
+
+
+                    <h5 className="float-start mt-4">
+                      Monitoring Elements (using historical as basis)
+                    </h5>
+
                     <Form.Group as={Col} md="12">
                       <Row>
                         <ul className="nav brand-tabs">
                           <Col md="2">
                             <li style={{ cursor: "pointer" }}>
                               <a
-                                className={`nav-link ${
-                                  selectedOptionShow === "Company/Brand"
-                                    ? "active cursor-pointer"
-                                    : ""
-                                }`}
+                                className={`nav-link ${selectedOptionShow === "Company/Brand"
+                                  ? "active cursor-pointer"
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleRadioSectionShow("Company/Brand")
                                 }
@@ -829,11 +903,10 @@ function MainPage() {
                           <Col md="auto">
                             <li style={{ cursor: "pointer" }}>
                               <a
-                                className={`nav-link ${
-                                  selectedOptionShow === "Product"
-                                    ? "active cursor-pointer"
-                                    : ""
-                                }`}
+                                className={`nav-link ${selectedOptionShow === "Product"
+                                  ? "active cursor-pointer"
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleRadioSectionShow("Product")
                                 }
@@ -845,11 +918,10 @@ function MainPage() {
                           <Col md="2">
                             <li style={{ cursor: "pointer" }}>
                               <a
-                                className={`nav-link ${
-                                  selectedOptionShow === "Key Prompt"
-                                    ? "active cursor-pointer"
-                                    : ""
-                                }`}
+                                className={`nav-link ${selectedOptionShow === "Key Prompt"
+                                  ? "active cursor-pointer"
+                                  : ""
+                                  }`}
                                 onClick={() =>
                                   handleRadioSectionShow("Key Prompt")
                                 }
@@ -865,7 +937,7 @@ function MainPage() {
                     {/*------------------ Company/Brand Second Section -----------------*/}
                     {selectedOptionShow === "Company/Brand" && (
                       <>
-                        <BrandRadioOptions
+                        <MBrandRadioOptions
                           selectedOption={selectedOption}
                           handleRadioSelection={handleRadioSelection}
                         />
@@ -879,11 +951,10 @@ function MainPage() {
                               <Col md="2">
                                 <li style={{ cursor: "pointer" }}>
                                   <a
-                                    className={`nav-link ${
-                                      selectedOptionSecondShow === "Daily"
-                                        ? "active cursor-pointer"
-                                        : ""
-                                    }`}
+                                    className={`nav-link ${selectedOptionSecondShow === "Daily"
+                                      ? "active cursor-pointer"
+                                      : ""
+                                      }`}
                                     onClick={() =>
                                       handleRadioSectionSecondShow("Daily")
                                     }
@@ -895,11 +966,10 @@ function MainPage() {
                               <Col md="2">
                                 <li style={{ cursor: "pointer" }}>
                                   <a
-                                    className={`nav-link ${
-                                      selectedOptionSecondShow === "Weekly"
-                                        ? "active cursor-pointer"
-                                        : ""
-                                    }`}
+                                    className={`nav-link ${selectedOptionSecondShow === "Weekly"
+                                      ? "active cursor-pointer"
+                                      : ""
+                                      }`}
                                     onClick={() =>
                                       handleRadioSectionSecondShow("Weekly")
                                     }
@@ -911,11 +981,10 @@ function MainPage() {
                               <Col md="2">
                                 <li style={{ cursor: "pointer" }}>
                                   <a
-                                    className={`nav-link ${
-                                      selectedOptionSecondShow === "Monthly"
-                                        ? "active cursor-pointer"
-                                        : ""
-                                    }`}
+                                    className={`nav-link ${selectedOptionSecondShow === "Monthly"
+                                      ? "active cursor-pointer"
+                                      : ""
+                                      }`}
                                     onClick={() =>
                                       handleRadioSectionSecondShow("Monthly")
                                     }
@@ -933,7 +1002,7 @@ function MainPage() {
 
                     {/*-------------------------- Product -----------------------*/}
                     {selectedOptionShow === "Product" && (
-                      <ProductRadioOptions
+                      <MProductRadioOptions
                         promptData={promptData}
                         setPromptData={setPromptData}
                         selectedOption={selectedOption}
@@ -974,33 +1043,32 @@ function MainPage() {
                     {/*-------------------------- Key Prompt -----------------------*/}
                     {/**************** Very Small Discover First Section *******************/}
                     {/*$$$$$$$$$$$$$$$$$$$$$ Inside Data Section $$$$$$$$$$$$$$$$$$$$$$$$*/}
-                    {selectedOption === "Brand Overview" && (
+                    {selectedOption === "Brand Overview and Favorability" && (
                       <MOverviewComponent
                         checkedItems={checkedItems}
                         handleCheckBoxChange={handleCheckBoxChange}
                       />
                     )}
 
-                    {selectedOption === "Brand Favorability" && (
+                    {/* {selectedOption === "Brand Index Score" && (
                       <MFavorabilityComponent
                         checkedItems={checkedItems}
                         handleCheckBoxChange={handleCheckBoxChange}
                       />
+                    )} */}
+
+                    {selectedOption === "Category Dimensions" && selectedOptionShow === "Company/Brand" && (
+                      <MCategoryDimensions
+                        checkedItems={checkedItems}
+                        handleCheckBoxChange={handleCheckBoxChange}
+                        handlePromptBrandReachChange={
+                          handlePromptBrandReachChange
+                        }
+                        promptBrandReach={promptBrandReach}
+                      />
                     )}
 
-                    {selectedOption === "                                                                                                                                                                                                                                                            " &&
-                      selectedOptionShow === "Company/Brand" && (
-                        <MCategoryDimensions
-                          checkedItems={checkedItems}
-                          handleCheckBoxChange={handleCheckBoxChange}
-                          handlePromptBrandReachChange={
-                            handlePromptBrandReachChange
-                          }
-                          promptBrandReach={promptBrandReach}
-                        />
-                      )}
-
-                    {selectedOption === "Brand Reach" &&
+                    {selectedOption === "Category Leadership" &&
                       selectedOptionFirstShow === "Monitoring" && (
                         <MReachComponent
                           promptBrandReach={promptBrandReach}
@@ -1024,13 +1092,13 @@ function MainPage() {
                         />
                       )}
 
-                    {selectedOption === "Dashboard and Reporting" &&
+                    {/* {selectedOption === "Hallucinations" &&
                       selectedOptionShow === "Company/Brand" && (
                         <DashboardReportingData
                           checkedItems={checkedItems}
                           handleCheckBoxChange={handleCheckBoxChange}
                         />
-                      )}
+                      )} */}
 
                     {selectedOption === "Product Representation" && (
                       <MRepresentationComponent
@@ -1107,6 +1175,7 @@ function MainPage() {
               <LLMDataDisplayComponent
                 dataItem={dataItem}
                 copyToClipboard={copyToClipboard}
+                selectedOptionFirstShow={selectedOptionFirstShow}
               />
             )}
             {/*-------------------- Data Display Section --------------------*/}

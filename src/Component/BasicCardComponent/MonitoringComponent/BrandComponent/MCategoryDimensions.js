@@ -13,9 +13,9 @@ function MCategoryDimensions({
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
         <Card.Body>
-          <Card.Title className="mb-4">Brand Category Dimensions</Card.Title>
+          <Card.Title className="mb-4">Category Dimensions</Card.Title>
           <Card.Text>
-            <ul className="focus-on mt-4">
+            {/* <ul className="focus-on mt-4">
               <li>
                 <Form.Group as={Col} md="5">
                   <Form.Control
@@ -31,12 +31,11 @@ function MCategoryDimensions({
                   />
                 </Form.Group>
               </li>
-            </ul>
+            </ul> */}
           </Card.Text>
           <ul className="focus-on">
             {[
-              "Frequently recommended buying criteria/considerations",
-              "Sources",
+              "Key ones and if they change",
             ].map((key) => (
               <li key={key}>
                 <input
@@ -45,7 +44,7 @@ function MCategoryDimensions({
                   value=""
                   checked={checkedItems.includes(key)}
                   onChange={() =>
-                    handleCheckBoxChange("Dashboard and Reporting", key)
+                    handleCheckBoxChange("Brand Category Dimensions", key)
                   }
                 />{" "}
                 {key}

@@ -6,9 +6,12 @@ import "../../../../App.css";
 function CategoryDimensions({
   checkedItems,
   handleCheckBoxChange,
-  handlePromptBrandReachChange,
-  promptBrandReach,
+  handlePromptBrandReachChange1,
+  promptBrandReach1,
 }) {
+
+
+  
   return (
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
@@ -24,8 +27,8 @@ function CategoryDimensions({
                     cols={2}
                     placeholder="Enter Brand Category vs. Enter Brand Category Dimensions"
                     name="promptBrandReach"
-                    value={promptBrandReach}
-                    onChange={handlePromptBrandReachChange}
+                    value={promptBrandReach1}
+                    onChange={handlePromptBrandReachChange1}
                     className="big1"
                     style={{ height: "70px", width: "28rem" }}
                   />

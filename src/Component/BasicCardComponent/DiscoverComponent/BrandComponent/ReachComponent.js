@@ -4,9 +4,9 @@ import "../../../../App.css";
 
 
 function ReachComponent({
-  promptBrandReach,
+  promptBrandReach1,
   checkedItems,
-  handlePromptBrandReachChange,
+  handlePromptBrandReachChange1,
   handleCheckBoxChange,
 }) {
   return (
@@ -24,8 +24,8 @@ function ReachComponent({
                     cols={2}
                     placeholder="Enter Brand Category"
                     name="promptBrandReach"
-                    value={promptBrandReach}
-                    onChange={handlePromptBrandReachChange}
+                    value={promptBrandReach1}
+                    onChange={handlePromptBrandReachChange1}
                     className="big1"
                   />
                 </Form.Group>

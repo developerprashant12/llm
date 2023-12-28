@@ -17,7 +17,7 @@ function MBrandCompetition({
         <Card.Body>
           <Card.Title className="">Competition</Card.Title>
           <ul className="focus-on mt-4">
-            <li className="mb-3">
+            {/* <li className="mb-3">
               <input
                 type="checkbox"
                 name=""
@@ -43,7 +43,7 @@ function MBrandCompetition({
               </div>
             ) : (
               ""
-            )}
+            )} */}
 
             <li>What Dimensions Would You Like to Focus On?</li>
             <ul
@@ -59,9 +59,8 @@ function MBrandCompetition({
                 }}
               >
                 {[
-                  "Brand Description",
-                  "Top 5 Positive and Negative Attributes",
-                  "Top Positive and Negative Facts",
+                  "5 Positive and Negative Attributes",
+                  "Positive and Negative Facts",
                 ].map((key) => (
                   <li key={key}>
                     <input

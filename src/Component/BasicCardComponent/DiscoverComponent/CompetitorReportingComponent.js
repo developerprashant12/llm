@@ -52,8 +52,8 @@ function CompetitorReportingComponent() {
               {Object.keys(dataItem).map((name) => (
                 <th className="text-center" key={name} style={thStyle}>
                   {" "}
-                  {name === "gpt_4"
-                    ? "GPT4"
+                  {name === "gpt_4_turbo"
+                    ? "GPT4 Turbo"
                     : name === "palm2_text"
                     ? "Palm2"
                     : name === "llama2_70b_chat"
