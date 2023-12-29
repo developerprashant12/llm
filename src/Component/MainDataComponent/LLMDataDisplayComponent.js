@@ -7,13 +7,95 @@ import {
   fetchDataFromFirebase,
   deleteDataFromFirebase,
 } from "../../DatabaseFirebase/firebaseService";
+import { diff_match_patch } from 'diff-match-patch';
 
 const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirstShow }) => {
   const [dataHistory, setDataHistory] = useState([]);
+  const [dataHistory1, setDataHistory1] = useState([]);
   const alertShownRef = useRef(false);
   const [editedData, setEditedData] = useState(null);
+  const [differences, setDifferences] = useState(false);
+
 
   //--------------------- Match Notification Data ---------------------//
+
+
+  useEffect(() => {
+   
+     fetchDataFromFirebase((data) => {
+      const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
+        key,
+        ...value,
+      }));
+      setDataHistory1(arrayOfObjects)
+    });
+  }, []);
+
+
+  useEffect(() => {
+    // Check if the data is already stored in localStorage
+    const storedDataString = localStorage.getItem("last10data");
+    if (storedDataString) {
+      try {
+        // Try to parse the storedDataString into an array
+        const storedData = JSON.parse(storedDataString);
+  
+        // Fetch data from Firebase
+        if (selectedOptionFirstShow === "Monitoring" && dataItem != null) {
+          fetchDataFromFirebase((data) => {
+            const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
+              key,
+              ...value,
+            }));
+  
+            // Get the last 10 items
+            const last10Items = arrayOfObjects.slice(-10);
+  
+            // Compare the keys of storedData and last10Items
+            const isDataMatch = storedData.every((storedItem, index) => storedItem.key === last10Items[index].key);
+  
+            // Update state only if data is different
+            if (!isDataMatch) {
+              setDifferences(true);
+              const initialDataString = JSON.stringify(last10Items);
+              localStorage.setItem("last10data", initialDataString);
+  
+              // Update state with the initial data
+              setDataHistory(last10Items);
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error parsing storedDataString:", error);
+        // Handle the error, possibly by resetting or clearing the localStorage
+      }
+    } else {
+      // If no data is found, fetch data from Firebase
+      if (selectedOptionFirstShow === "Monitoring" && dataItem != null) {
+        fetchDataFromFirebase((data) => {
+          const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
+            key,
+            ...value,
+          }));
+  
+          // Get the last 10 items
+          const last10Items = arrayOfObjects.slice(-10);
+  
+          // Store the initial data in localStorage
+          const initialDataString = JSON.stringify(last10Items);
+          localStorage.setItem("last10data", initialDataString);
+  
+          // Update state with the initial data
+          setDataHistory(last10Items);
+        });
+      }
+    }
+  }, [selectedOptionFirstShow, dataItem]);
+  
+  
+  
+
+
   useEffect(() => {
     if (dataHistory.length > 1) {
       const test = [];
@@ -23,7 +105,6 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
       dataHistory.forEach((item, index) => {
         const data = JSON.parse(item.data);
   
-        // Check if the properties exist and are arrays before accessing index 0
         if (data.palm2_text && Array.isArray(data.palm2_text) && data.palm2_text.length > 0) {
           test.push(data.palm2_text[0]);
         }
@@ -36,14 +117,13 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
           test2.push(data.llama2_70b_chat[0]);
         }
   
-        const dataItemData = data.palm2_text + data.gpt_4_turbo + data.llama2_70b_chat;
-      });
+       });
   
       const allValues = test.concat(test1, test2).join('\n\n');
   
       const payloadData = {
         input_prompt: "Please make me a short summary of this data in which all the information of my data should be included in that summary. :- " + " " + allValues,
-        selected_models: ["gpt_4"],
+        selected_models: ["gpt_4_turbo"],
         avoid_repetition: false,
         num_outputs: 1,
         quality: 1,
@@ -54,14 +134,25 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
       fetch("https://api.gooey.ai/v2/CompareLLM/", {
         method: "POST",
         headers: {
-          Authorization: "Bearer sk-XnkmQiv9OI6pJTxKiCG8BWI31y7T0CmFDyIwaAiDPIOlO4Om",
+          Authorization: "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payloadData),
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Summarize Data:", data);
+          //------- Summarize Data Section--------//
+          const sumarisedDataItem = data.output.output_text.gpt_4_turbo
+          console.log("sumarisedDataItem",sumarisedDataItem);
+          const firstDataString = typeof sumarisedDataItem === 'object' ? JSON.stringify(sumarisedDataItem) : sumarisedDataItem;
+          const SecondDataString = typeof dataItem === 'object' ? JSON.stringify(dataItem) : dataItem;
+          const dmp = new diff_match_patch();
+          const diffs = dmp.diff_main(firstDataString, SecondDataString);
+          dmp.diff_cleanupSemantic(diffs);
+          if(diffs){
+            alert("The data received in the LLm is expressing slight variations from the summary of the past 10 times' data")
+          }
+          //------- Summarize Data Section--------//
         });
     }
   }, [dataHistory]);
@@ -80,18 +171,7 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
     setEditedData(JSON.parse(data));
   };
 
-  useEffect(() => {
-    fetchDataFromFirebase((data) => {
-      const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
-        key,
-        ...value,
-      }));
 
-    //---------- Get the last 10 items
-    const last10Items = arrayOfObjects.slice(-10);
-      setDataHistory(last10Items);
-    });
-  }, []);
 
 
   // Function to group data by date
@@ -107,7 +187,7 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
   };
 
   //---------------- Grouping data by date ----------------//
-  const groupedDataByDate = groupDataByDate(dataHistory);
+  const groupedDataByDate = groupDataByDate(dataHistory1);
 
   const isToday = (date) => {
     const todayDate = new Date();
@@ -126,7 +206,7 @@ const LLMDataDisplayComponent = ({ dataItem, copyToClipboard,selectedOptionFirst
     return (
       entryDate.getDate() === yesterday.getDate() &&
       entryDate.getMonth() === yesterday.getMonth() &&
-      entryDate.getFullYear() === yesterday.getFullYear()
+      entryDate.getFullYear() === yesterday.getFullYear() 
     );
   };
 

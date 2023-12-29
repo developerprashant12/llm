@@ -198,7 +198,7 @@ function MainPage() {
 
   const handleRadioSectionShow = (option) => {
     setSelectedOptionShow(option);
-    setSelectedOption(null);
+    // setSelectedOption(null);
     setPromptData("");
     setShowCheckBoxData(false);
     setCompetitors("");
@@ -206,7 +206,7 @@ function MainPage() {
     setPromptBrandReach1("");
     setAgainSelectedItems([]);
     setSelectedItems({});
-    setSelectedOption(null);
+    // setSelectedOption(null);
     setSelectAll(false);
     setSelectedCount(0);
     setPromptBrandKey("");
@@ -214,7 +214,7 @@ function MainPage() {
 
   const handleRadioSectionFirstShow = (option) => {
     setSelectedOptionFirstShow(option);
-    setSelectedOption(null);
+    // setSelectedOption(null);
     setPromptData("");
     setShowCheckBoxData(false);
     setCompetitors("");
@@ -222,7 +222,7 @@ function MainPage() {
     setPromptBrandReach1("");
     setAgainSelectedItems([]);
     setSelectedItems({});
-    setSelectedOption(null);
+    // setSelectedOption(null);
     setSelectAll(false);
     setSelectedCount(0);
     setPromptBrandKey("");
@@ -330,7 +330,7 @@ function MainPage() {
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-XnkmQiv9OI6pJTxKiCG8BWI31y7T0CmFDyIwaAiDPIOlO4Om",
+          "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -343,6 +343,7 @@ function MainPage() {
             setShowData(false);
             setShowGetData(true);
             setDataItem(data.output.output_text);
+            console.log("data.output.output_text",data.output.output_text);
             //-------------- Set Data LocalStorage -------------//
             const currentDate = new Date();
             const options = {
@@ -399,10 +400,10 @@ function MainPage() {
   const handleClickReset = () => {
     setShowGetData(false);
     setPromptData("");
-    setCheckedItems([]);
+    // setCheckedItems([]);
     setSelectedItems({});
     setAgainSelectedItems([]);
-    setSelectedOption(null);
+    // setSelectedOption(null);
     setSelectAll(false);
     setSelectedCount(0);
     setShowCheckBoxData(false);

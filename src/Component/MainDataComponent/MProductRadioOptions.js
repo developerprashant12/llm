@@ -14,14 +14,14 @@ function MProductRadioOptions({
         as={Col}
         md="4"
         className="cursor-pointer"
-        onClick={() => handleRadioSelection("Product Overview")}
+        onClick={() => handleRadioSelection("Product Attributes")}
       >
         <Form.Check
           type="radio"
           name="firstName"
-          label="Product Overview"
+          label="Product Attributes"
           className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Product Overview"}
+          checked={selectedOption === "Product Attributes"}
         />
       </Form.Group>
 
@@ -29,14 +29,14 @@ function MProductRadioOptions({
         as={Col}
         md="4"
         className="cursor-pointer"
-        onClick={() => handleRadioSelection("Product Favorability")}
+        onClick={() => handleRadioSelection("Campaign Messages")}
       >
         <Form.Check
           type="radio"
           name="firstName"
-          label="Product Favorability"
+          label="Campaign Messages"
           className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Product Favorability"}
+          checked={selectedOption === "Campaign Messages"}
         />
       </Form.Group>
 
@@ -44,46 +44,18 @@ function MProductRadioOptions({
         as={Col}
         md="4"
         className="cursor-pointer"
-        onClick={() => handleRadioSelection("Product Representation")}
+        onClick={() => handleRadioSelection("Category Dimensions")}
       >
         <Form.Check
           type="radio"
           name="firstName"
-          label="Product Representation"
+          label="Category Dimensions"
           className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Product Representation"}
+          checked={selectedOption === "Category Dimensions"}
         />
       </Form.Group>
 
-      <Form.Group
-        as={Col}
-        md="4"
-        className="cursor-pointer"
-        onClick={() => handleRadioSelection("Product Reach")}
-      >
-        <Form.Check
-          type="radio"
-          name="firstName"
-          label="Product Reach"
-          className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Product Reach"}
-        />
-      </Form.Group>
-
-      <Form.Group
-        as={Col}
-        md="4"
-        className="cursor-pointer"
-        onClick={() => handleRadioSelection("Competition")}
-      >
-        <Form.Check
-          type="radio"
-          name="firstName"
-          label="Competition"
-          className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Competition"}
-        />
-      </Form.Group>
+  
 
       <Form.Group
         as={Col}

@@ -892,7 +892,7 @@ tfoot,
 th,
 thead,
 tr {
-  border-color: white !important;
+  border-color: rgb(133 111 111) !important;
   border-style: ridge !important;
   border-width: 1px !important;
   padding: 7px;
