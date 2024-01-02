@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 function CompetitorReportingComponent() {
   const tableRef = useRef(null);
   const location = useLocation();
-  console.log(location);
+  // console.log(location);
   const urlSearchParams = new URLSearchParams(location.search);
   const dataParam = urlSearchParams.get("data");
   const dataItem = dataParam ? JSON.parse(dataParam) : null;
@@ -18,7 +18,7 @@ function CompetitorReportingComponent() {
     ? checkedItemStoreParam.split(",")
     : [];
 
-  console.log(checkedItemStore);
+  // console.log(checkedItemStore);
 
   const downloadPDF = () => {
     const input = tableRef.current;

@@ -19,7 +19,7 @@ function ReportingComponent({
   const tableRef = useRef(null);
   const navigate = useNavigate();
 
-  console.log("checkedItemStore",checkedItemStore);
+  // console.log("checkedItemStore",checkedItemStore);
   // console.log("dataItem",dataItem);
 
 

@@ -330,7 +330,7 @@ function MainPage() {
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
+          "Bearer sk-kvVveaIyhhqXcHIML6D4bxDk94gQbIJ6oh5xQ0wqxsASIsHT",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -343,7 +343,7 @@ function MainPage() {
             setShowData(false);
             setShowGetData(true);
             setDataItem(data.output.output_text);
-            console.log("data.output.output_text",data.output.output_text);
+            // console.log("data.output.output_text",data.output.output_text);
             //-------------- Set Data LocalStorage -------------//
             const currentDate = new Date();
             const options = {
