@@ -68,10 +68,13 @@
   font-weight: 370 !important;
 }
 
+
+
+
 .height3 {
   padding: 8px 14px !important;
   border-radius: 2px !important;
-  font-size: 19px !important;
+  font-size: 19px ;
   color: #9da3a9 !important;
   cursor: pointer;
   box-shadow: none !important;
@@ -88,6 +91,9 @@
   cursor: pointer;
   font-weight: 100 !important;
 }
+
+
+
 
 .custom-placeholder::placeholder {
   font-size: 21px !important;
@@ -110,6 +116,8 @@
   background-color: #ffffff !important;
   font-weight: 220 !important;
 }
+
+
 
 input.form-check-input {
   background-image: url('/public/check-mark.png') ;
@@ -178,16 +186,20 @@ ul.nav.brand-tabs a {
   border-left: 0.3em solid transparent;
 }
 
-
+/*----------- Media Query Code  --------------*/
 @media screen and (max-width: 420px) {
   .dropdown-toggle::after {
     margin-left: 90px !important;
   }
-/* 
-  body {
-    background-color: red !important;
-  } */
+
+  .dropdownllms {
+    margin-bottom: 25px;
+  }
+
+  
 }
+/*----------- Media Query Code  --------------*/
+
 
 .btn.show {
   border: none !important;
@@ -940,4 +952,8 @@ textarea{
 .topData {
   margin-top: -20px !important;
   margin-left: 20px;
+}
+
+.react-toastify__toast-body {
+  border-bottom: none !important;
 }

@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import {NotificationContainer, NotificationManager} from 'react-notifications';
-import 'react-notifications/lib/notifications.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Container, Card, Col, Table, Button } from "react-bootstrap";
 import Markdown from "markdown-to-jsx";
 import html2canvas from "html2canvas";
@@ -62,14 +62,14 @@ function ReportingComponent({
       const url = `${baseRoute}?data=${encodeURIComponent(JSON.stringify(dataItem))}&checkedItemStore=${encodeURIComponent(checkedItemStore)}`;
       window.open(url, "_blank");
     } else if (key === "LLM Comparison Report" && showGetData !== true) {
-      NotificationManager.warning('LLM Comparison Report is not Available - First you launch and hit the API. Then wait, after the data arrives, your report will become available.', '', 4000);
+      toast.warning('LLM Comparison Report is not Available - First you launch and hit the API. Then wait, after the data arrives, your report will become available.');
     }
   
     if (key === "LLM Competitor Report" && showGetData === true) {
       const url = `${baseRoute}?data=${encodeURIComponent(JSON.stringify(dataItem))}`;
       window.open(url, "_blank");
     } else if (key === "LLM Competitor Report" && showGetData !== true) {
-      NotificationManager.warning('LLM Competitor Report is not Available - First you launch and hit the API. Then wait, after the data arrives, your report will become available.', '', 4000);
+      toast.warning('LLM Competitor Report is not Available - First you launch and hit the API. Then wait, after the data arrives, your report will become available.');
     }
   };
   
@@ -103,7 +103,7 @@ function ReportingComponent({
           </ul>
         </Card.Body>
       </Card>
-      <NotificationContainer/>
+      <ToastContainer  />
     </Container>
   );
 }

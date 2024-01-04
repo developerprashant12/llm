@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  NotificationContainer,
-  NotificationManager,
-} from "react-notifications";
-import "react-notifications/lib/notifications.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Row, Col, Card, Container } from "react-bootstrap";
 import Markdown from "markdown-to-jsx";
 import {
   fetchDataFromFirebase,
   deleteDataFromFirebase,
 } from "../../DatabaseFirebase/firebaseService";
-import { diff_match_patch } from "diff-match-patch";
 
 const LLMDataDisplayComponent = ({
   dataItem,
@@ -22,6 +18,7 @@ const LLMDataDisplayComponent = ({
   const alertShownRef = useRef(false);
   const [editedData, setEditedData] = useState(null);
   const [summary, setSummary] = useState("");
+  const [loading, setLoading] = useState(false);
   // console.log("object", JSON.stringify(dataItem));
 
   //--------------------- Match Notification Data ---------------------//
@@ -32,36 +29,30 @@ const LLMDataDisplayComponent = ({
         key,
         ...value,
       }));
-      setDataHistory1(arrayOfObjects);
+      setDataHistory(arrayOfObjects);
     });
   }, []);
 
-  //   useEffect(() => {
-  //     if(selectedOptionFirstShow === "Monitoring" && dataItem != undefined){
-  //       fetchDataFromFirebase((data) => {
-  //         const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
-  //           key,
-  //           ...value,
-  //         }));
+    useEffect(() => {
+      if(selectedOptionFirstShow === "Monitoring" && dataItem != undefined){
+        fetchDataFromFirebase((data) => {
+          const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
+            key,
+            ...value,
+          }));
 
-  //       const last10Items = arrayOfObjects.slice(-10);
-  //       //  localStorage.setItem("last10data",last10Items)
-  //       setDataHistory1(last10Items);
-  //       });
-  //     }
-  // }, []);
+        const last10Items = arrayOfObjects.slice(-10);
+        setDataHistory1(last10Items);
+        });
+      }
+  }, []);
 
   useEffect(() => {
-    if (selectedOptionFirstShow === "Monitoring" && dataItem != undefined) {
+    if (selectedOptionFirstShow === "Monitoring" && dataItem !== undefined && !alertShownRef.current) {
       const test = [];
       const test1 = [];
       const test2 = [];
- 
-      console.log("sdsdsadasddasdas",dataItem.palm2_text);
 
-
-      // dataItem.forEach((item, index) => {
-      //   const data = JSON.parse(item.data);
 
       if (
         dataItem.palm2_text &&
@@ -87,8 +78,6 @@ const LLMDataDisplayComponent = ({
         test2.push(dataItem.llama2_70b_chat[0]);
       }
 
-      //  });
-
       const allValues = test.concat(test1, test2).join("\n\n");
 
       const payloadData = {
@@ -108,13 +97,20 @@ const LLMDataDisplayComponent = ({
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-kvVveaIyhhqXcHIML6D4bxDk94gQbIJ6oh5xQ0wqxsASIsHT",
+            "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payloadData),
       })
         .then((response) => response.json())
         .then((data) => {
+          if (!alertShownRef.current) {
+            toast.info(
+              "The data of LLM had arrived successfully. But Now we are matching the LLM data of the old 10 times with the current LLM data and finding its difference. So, Please wait for 2-4 minutes....",
+              { autoClose: 6000 }
+            );
+            alertShownRef.current = true; 
+          }
           const sumarisedDataItem = data.output.output_text.gpt_4_turbo;
           console.log("summary1", sumarisedDataItem);
           setSummary(sumarisedDataItem);
@@ -122,11 +118,19 @@ const LLMDataDisplayComponent = ({
     }
   }, [dataItem]);
 
+   //--- Cleanup alert show again ----//
+   useEffect(() => {
+    return () => {
+      alertShownRef.current = false;
+    };
+  }, []);
+  //--- Cleanup alert show again ----//
+
   useEffect(() => {
     if (
       dataHistory1.length > 1 &&
       selectedOptionFirstShow === "Monitoring" &&
-      dataItem != undefined
+      dataItem !== undefined
     ) {
       const test = [];
       const test1 = [];
@@ -179,7 +183,7 @@ const LLMDataDisplayComponent = ({
         method: "POST",
         headers: {
           Authorization:
-            "Bearer sk-kvVveaIyhhqXcHIML6D4bxDk94gQbIJ6oh5xQ0wqxsASIsHT",
+            "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payloadData),
@@ -195,98 +199,49 @@ const LLMDataDisplayComponent = ({
               : sumarisedDataItem;
           const SecondDataString =
             typeof dataItem === "object" ? JSON.stringify(summary) : summary;
-          
-            const payloadData = {
-              input_prompt:
-                "Please take out a difference of both these data and Give me the response in the Paragraph. :- " +
-                " " +
-                firstDataString + " " + "vs" + " " + SecondDataString,
-              selected_models: ["gpt_4_turbo"],
-              avoid_repetition: false,
-              num_outputs: 1,
-              quality: 1,
-              sampling_temperature: 0.7,
-              variables: null,
-            };
-      
-            fetch("https://api.gooey.ai/v2/CompareLLM/", {
-              method: "POST",
-              headers: {
-                Authorization:
-                  "Bearer sk-kvVveaIyhhqXcHIML6D4bxDk94gQbIJ6oh5xQ0wqxsASIsHT",
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payloadData),
-            })
-              .then((response) => response.json())
-              .then((data)=>{
-                  const Differences = data.output.output_text.gpt_4_turbo;
-                  if (Differences) {
-                    alert(Differences);
-                  }
-                  console.log("Differences :- ",Differences);
-              })
 
-          
+          const payloadData = {
+            input_prompt:
+              "Please take out a difference of both these data and Give me the response in the Paragraph. :- " +
+              " " +
+              firstDataString +
+              " " +
+              "vs" +
+              " " +
+              SecondDataString,
+            selected_models: ["gpt_4_turbo"],
+            avoid_repetition: false,
+            num_outputs: 1,
+            quality: 1,
+            sampling_temperature: 0.7,
+            variables: null,
+          };
+
+          fetch("https://api.gooey.ai/v2/CompareLLM/", {
+            method: "POST",
+            headers: {
+              Authorization:
+                "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payloadData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              setLoading(false);
+              const Differences = data.output.output_text.gpt_4_turbo;
+              if (Differences) {
+                alert("DIFFERENCES OF 10TIMES LLM DATA and CURRENT LLM DATA :- " + Differences);
+              }
+              console.log("Differences :- ", Differences);
+            });
+
           //------- Summarize Data Section--------//
         });
     }
   }, [dataHistory1]);
 
-  // useEffect(() => {
-  //   const storedDataString = localStorage.getItem("last10data");
-  //   if (storedDataString) {
-  //     try {
-  //       const storedData = JSON.parse(storedDataString);
-
-  //       if (selectedOptionFirstShow === "Monitoring" && dataItem != null) {
-  //         fetchDataFromFirebase((data) => {
-  //           const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
-  //             key,
-  //             ...value,
-  //           }));
-
-  //           const last10Items = arrayOfObjects.slice(-10);
-
-  //           const isDataMatch = storedData.every((storedItem, index) => storedItem.key === last10Items[index].key);
-
-  //           if (!isDataMatch) {
-  //             setDifferences(true);
-  //             const initialDataString = JSON.stringify(last10Items);
-  //             localStorage.setItem("last10data", initialDataString);
-
-  //             setDataHistory(last10Items);
-  //           }
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error("Error parsing storedDataString:", error);
-  //     }
-  //   } else {
-  //     if (selectedOptionFirstShow === "Monitoring" && dataItem != null) {
-  //       fetchDataFromFirebase((data) => {
-  //         const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
-  //           key,
-  //           ...value,
-  //         }));
-  //         const last10Items = arrayOfObjects.slice(-10);
-
-  //         const initialDataString = JSON.stringify(last10Items);
-  //         localStorage.setItem("last10data", initialDataString);
-
-  //         setDataHistory(last10Items);
-  //       });
-  //     }
-  //   }
-  // }, [selectedOptionFirstShow, dataItem]);
-
-  //--- Cleanup alert show again ----//
-  useEffect(() => {
-    return () => {
-      alertShownRef.current = false;
-    };
-  }, []);
-  //--- Cleanup alert show again ----//
+  
 
   //--------------------- Match Notification Data ---------------------//
   const handleEditData = (data) => {
@@ -306,7 +261,7 @@ const LLMDataDisplayComponent = ({
   };
 
   //---------------- Grouping data by date ----------------//
-  const groupedDataByDate = groupDataByDate(dataHistory1);
+  const groupedDataByDate = groupDataByDate(dataHistory);
 
   const isToday = (date) => {
     const todayDate = new Date();
@@ -518,7 +473,7 @@ const LLMDataDisplayComponent = ({
           </Container>
         </Card>
       </Col>
-      <NotificationContainer />
+      <ToastContainer />
     </Row>
   );
 };

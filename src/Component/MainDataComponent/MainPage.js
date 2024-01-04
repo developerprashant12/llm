@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import OverviewComponent from "../BasicCardComponent/DiscoverComponent/BrandComponent/OverviewComponent";
 import FavorabilityComponent from "../BasicCardComponent/DiscoverComponent/BrandComponent/FavorabilityComponent";
 import CategoryDimensions from "../BasicCardComponent/DiscoverComponent/BrandComponent/CategoryDimensions";
@@ -24,11 +26,6 @@ import LLMDataDisplayComponent from "./LLMDataDisplayComponent";
 import LLMSelectionComponent from "./LLMSelectionComponent ";
 import "../../App.css";
 import { Container, Form, Row, Col } from "react-bootstrap";
-import {
-  NotificationContainer,
-  NotificationManager,
-} from "react-notifications";
-import 'react-notifications/lib/notifications.css';
 import ChatComponent from "./ChatComponent";
 import CustomNavbar from "./Navbar";
 import BrandRadioOptions from "./BrandRadioOptions";
@@ -90,7 +87,7 @@ function MainPage() {
       .writeText(text)
       .then(() => {
         // alert("Text copied to clipboard");
-        NotificationManager.success("Text copied to clipboard", "", 3000);
+        toast.success("Text copied to clipboard");
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
@@ -198,7 +195,7 @@ function MainPage() {
 
   const handleRadioSectionShow = (option) => {
     setSelectedOptionShow(option);
-    // setSelectedOption(null);
+    setSelectedOption(null);
     setPromptData("");
     setShowCheckBoxData(false);
     setCompetitors("");
@@ -206,7 +203,6 @@ function MainPage() {
     setPromptBrandReach1("");
     setAgainSelectedItems([]);
     setSelectedItems({});
-    // setSelectedOption(null);
     setSelectAll(false);
     setSelectedCount(0);
     setPromptBrandKey("");
@@ -214,7 +210,7 @@ function MainPage() {
 
   const handleRadioSectionFirstShow = (option) => {
     setSelectedOptionFirstShow(option);
-    // setSelectedOption(null);
+    setSelectedOption(null);
     setPromptData("");
     setShowCheckBoxData(false);
     setCompetitors("");
@@ -222,7 +218,6 @@ function MainPage() {
     setPromptBrandReach1("");
     setAgainSelectedItems([]);
     setSelectedItems({});
-    // setSelectedOption(null);
     setSelectAll(false);
     setSelectedCount(0);
     setPromptBrandKey("");
@@ -330,7 +325,7 @@ function MainPage() {
         method: "POST",
         headers: {
           Authorization:
-          "Bearer sk-kvVveaIyhhqXcHIML6D4bxDk94gQbIJ6oh5xQ0wqxsASIsHT",
+          "Bearer sk-yHEfQk14zKxhFHLITJb7cdRotNCsaqqaatWMe6JsicpSYoTN",
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -338,7 +333,7 @@ function MainPage() {
         .then((response) => response.json())
         .then((data) => {
           if (data && data.output && data.output.output_text != undefined) {
-            NotificationManager.success("Launch Successfully", "", 3000);
+            toast.success("Launch Successfully");
             setCheckedItemStore(checkedItems);
             setShowData(false);
             setShowGetData(true);
@@ -375,25 +370,17 @@ function MainPage() {
             });
             //--------------- Firebase Data Setup ---------------//
           } else if (data.detail && data.detail.error) {
-            NotificationManager.error(
-              "Doh! You need to purchase additional credits to run more Gooey.AI recipes: https://gooey.ai/account",
-              "",
-              5000
-            );
+            toast.error(
+              "Doh! You need to purchase additional credits to run more Gooey.AI recipes: https://gooey.ai/account");
             setShowData(false);
           }
         })
         .catch((error) => {
           console.log(error);
-          // NotificationManager.error(error, "", 3000);
           setShowData(false);
         });
     } else {
-      NotificationManager.error(
-        "Please Completely filled prompt, Modal and select Brand/Product",
-        "",
-        3000
-      );
+      toast.error("Please Completely filled prompt, Modal and select Brand/Product");
     }
   };
 
@@ -773,6 +760,8 @@ function MainPage() {
                       handleCheckChange={handleCheckChange}
                       handleClickShow={handleClickShow}
                       handleClickReset={handleClickReset}
+                      selectedOption={selectedOption}
+                      selectedOptionFirstShow={selectedOptionFirstShow}
                     />
                     {/*$$$$$$$$$$$$$$$$$$$$$ Inside Data Section $$$$$$$$$$$$$$$$$$$$$$$$*/}
 
@@ -781,13 +770,13 @@ function MainPage() {
                 )}
                 {/*********************** Small Discover First Section *************************/}
 
-                {/*********************** Small Discover Second Section ************************/}
+                {/*********************** Small Monitoring First Section ************************/}
                 {selectedOptionFirstShow === "Monitoring" && (
                   <Row className="mb-3">
 
                     {
                       selectedOptionShow != "Key Prompt" && (
-                        <h6 className="float-start text mt-4">
+                        <h6 className="float-start text-lg mt-4">
                           What Would You Like to Moniter?
                         </h6>
                       )
@@ -835,7 +824,7 @@ function MainPage() {
                     {
                       selectedOptionShow != "Key Prompt" && (
                         <>
-                          <h6 className="float-start mt-5 mb-3">
+                          <h6 className="float-start text-lg mt-5 mb-3">
                             What is your basis of comparison?
                           </h6>
                           <Form.Group as={Col} md="10" className="topData">
@@ -844,8 +833,9 @@ function MainPage() {
                                 <Col md="2">
                                   <li style={{ cursor: "pointer" }}>
                                     <a
+                                      style={{fontSize : "medium"}}
                                       className={`nav-link ${selectedOptionthirdShow === "Historical"
-                                        ? "active cursor-pointer"
+                                        ? "active cursor-pointer text-sm"
                                         : ""
                                         }`}
                                       onClick={() =>
@@ -859,6 +849,7 @@ function MainPage() {
                                 <Col md="4">
                                   <li style={{ cursor: "pointer" }}>
                                     <a
+                                      style={{fontSize : "medium"}}
                                       className={`nav-link ${selectedOptionthirdShow === "Company Brand Attributes"
                                         ? "active cursor-pointer"
                                         : ""
@@ -879,7 +870,7 @@ function MainPage() {
                     }
 
 
-                    <h5 className="float-start mt-4">
+                    <h5 className="float-start text-lg mt-4">
                       Monitoring Elements (using historical as basis)
                     </h5>
 
@@ -942,64 +933,11 @@ function MainPage() {
                           selectedOption={selectedOption}
                           handleRadioSelection={handleRadioSelection}
                         />
-
-                        <h6 className="float-start mt-4">
-                          What Frequency Would You Like to Moniter?
-                        </h6>
-                        <Form.Group as={Col} md="8" className="topData">
-                          <Row>
-                            <ul className="nav brand-tabs">
-                              <Col md="2">
-                                <li style={{ cursor: "pointer" }}>
-                                  <a
-                                    className={`nav-link ${selectedOptionSecondShow === "Daily"
-                                      ? "active cursor-pointer"
-                                      : ""
-                                      }`}
-                                    onClick={() =>
-                                      handleRadioSectionSecondShow("Daily")
-                                    }
-                                  >
-                                    <span></span> Daily
-                                  </a>
-                                </li>
-                              </Col>
-                              <Col md="2">
-                                <li style={{ cursor: "pointer" }}>
-                                  <a
-                                    className={`nav-link ${selectedOptionSecondShow === "Weekly"
-                                      ? "active cursor-pointer"
-                                      : ""
-                                      }`}
-                                    onClick={() =>
-                                      handleRadioSectionSecondShow("Weekly")
-                                    }
-                                  >
-                                    <span></span> Weekly
-                                  </a>
-                                </li>
-                              </Col>
-                              <Col md="2">
-                                <li style={{ cursor: "pointer" }}>
-                                  <a
-                                    className={`nav-link ${selectedOptionSecondShow === "Monthly"
-                                      ? "active cursor-pointer"
-                                      : ""
-                                      }`}
-                                    onClick={() =>
-                                      handleRadioSectionSecondShow("Monthly")
-                                    }
-                                  >
-                                    <span></span> Monthly
-                                  </a>
-                                </li>
-                              </Col>
-                            </ul>
-                          </Row>
-                        </Form.Group>
-                      </>
-                    )}
+                        </>
+                )}
                     {/*------------------ Company/Brand Second Section -----------------*/}
+
+                   
 
                     {/*-------------------------- Product -----------------------*/}
                     {selectedOptionShow === "Product" && (
@@ -1051,12 +989,12 @@ function MainPage() {
                       />
                     )}
 
-                    {/* {selectedOption === "Brand Index Score" && (
+                   {selectedOption === "Sources" && (
                       <MFavorabilityComponent
                         checkedItems={checkedItems}
                         handleCheckBoxChange={handleCheckBoxChange}
                       />
-                    )} */}
+                    )} 
 
                     {selectedOption === "Category Dimensions" && selectedOptionShow === "Company/Brand" && (
                       <MCategoryDimensions
@@ -1153,6 +1091,67 @@ function MainPage() {
                         />
                       )}
 
+                      {/*------------------ Company/Brand Second Section -----------------*/}
+                      {selectedOptionShow === "Company/Brand" && (
+                        <>
+                          <h6 className="float-start mt-4">
+                            What Frequency Would You Like to Moniter?
+                          </h6>
+                          <Form.Group as={Col} md="8" className="topData mb-3">
+                            <Row>
+                              <ul className="nav brand-tabs">
+                                <Col md="2">
+                                  <li style={{ cursor: "pointer" }}>
+                                    <a
+                                      className={`nav-link ${selectedOptionSecondShow === "Daily"
+                                        ? "active cursor-pointer"
+                                        : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleRadioSectionSecondShow("Daily")
+                                      }
+                                    >
+                                      <span></span> Daily
+                                    </a>
+                                  </li>
+                                </Col>
+                                <Col md="2">
+                                  <li style={{ cursor: "pointer" }}>
+                                    <a
+                                      className={`nav-link ${selectedOptionSecondShow === "Weekly"
+                                        ? "active cursor-pointer"
+                                        : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleRadioSectionSecondShow("Weekly")
+                                      }
+                                    >
+                                      <span></span> Weekly
+                                    </a>
+                                  </li>
+                                </Col>
+                                <Col md="2">
+                                  <li style={{ cursor: "pointer" }}>
+                                    <a
+                                      className={`nav-link ${selectedOptionSecondShow === "Monthly"
+                                        ? "active cursor-pointer"
+                                        : ""
+                                        }`}
+                                      onClick={() =>
+                                        handleRadioSectionSecondShow("Monthly")
+                                      }
+                                    >
+                                      <span></span> Monthly
+                                    </a>
+                                  </li>
+                                </Col>
+                              </ul>
+                            </Row>
+                          </Form.Group>
+                        </>
+                      )}
+                      {/*------------------ Company/Brand Second Section -----------------*/}
+
                     <LLMSelectionComponent
                       selectedCount={selectedCount}
                       selectedItems={selectedItems}
@@ -1168,7 +1167,7 @@ function MainPage() {
                     {/**************** Very Small Discover First Section *******************/}
                   </Row>
                 )}
-                {/*********************** Small Discover Second Section ************************/}
+                {/*********************** Small Monitoring First Section ************************/}
               </Form>
             </Container>
             {/*-------------------- Data Display Section --------------------*/}
@@ -1183,7 +1182,7 @@ function MainPage() {
           </div>
           {/****************************** Big Initial Second Section ******************************/}
         </Container>
-
+  
         <ChatComponent
           isChatVisible={isChatVisible}
           toggleChat={toggleChat}
@@ -1194,7 +1193,7 @@ function MainPage() {
           handleSubmit={handleSubmit}
         />
       </Container>
-      <NotificationContainer />
+      <ToastContainer  />
     </div>
   );
 }

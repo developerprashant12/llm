@@ -43,7 +43,7 @@ function BrandRadioOptions({ selectedOption, handleRadioSelection }) {
           type="radio"
           name="firstName"
           label="Brand Category Dimensions"
-          className="height3 custom-checkbox mb-3"
+          className="height1 custom-checkbox mb-3"
           checked={selectedOption === "Brand Category Dimensions"}
         />
       </Form.Group>
@@ -87,7 +87,7 @@ function BrandRadioOptions({ selectedOption, handleRadioSelection }) {
           type="radio"
           name="firstName"
           label="Dashboard and Reporting"
-          className="height3 custom-checkbox mb-3"
+          className="height1 custom-checkbox mb-3"
           checked={selectedOption === "Dashboard and Reporting"}
         />
       </Form.Group>

@@ -11,6 +11,8 @@ const LLMSelectionComponent = ({
   handleCheckChange,
   handleClickShow,
   handleClickReset,
+  selectedOption,
+  selectedOptionFirstShow
 }) => (
   <Form.Group as={Col} md="12">
     <Row>
@@ -77,7 +79,7 @@ const LLMSelectionComponent = ({
             color: "white",
           }}
           onClick={handleClickShow}
-          disabled={showData}
+          disabled={showData || selectedOption === "Dashboard and Reporting"}
         >
           {showData ? (
             <div style={{ fontSize: "19px" }}>
@@ -108,12 +110,13 @@ const LLMSelectionComponent = ({
             color: "white",
           }}
           onClick={handleClickReset}
-          disabled={showData}
+          disabled={showData || selectedOption === "Dashboard and Reporting"}
         >
           RESET
         </Button>
       </Col>
     </Row>
+
   </Form.Group>
 );
 

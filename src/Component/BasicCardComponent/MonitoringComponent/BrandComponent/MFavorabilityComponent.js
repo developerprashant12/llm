@@ -11,14 +11,15 @@ function MFavorabilityComponent({
     <Container className="mb-3">
       <Card as={Col} md="12" className="border-0 whi">
         <Card.Body>
-          <Card.Title>Brand Index Score</Card.Title>
-          <Card.Text className="mt-4">
-            What dimensions do you want to focus on (choose all that apply)
-          </Card.Text>
+          <Card.Title>Sources</Card.Title>
+          {/*  <Card.Text className="mt-4">
+                 What dimensions do you want to focus on (choose all that apply)
+                 </Card.Text> */}
           <ul className="focus-on">
             {[
-              "Top 5 Positive and Negative Attributes",
-              "Most Positive and Negative Facts",
+              "Top Positive and Negative Attributes",
+              "Top Positive and Negative Facts",
+              "Category Leadership"
             ].map((key) => (
               <li key={key}>
                 <input

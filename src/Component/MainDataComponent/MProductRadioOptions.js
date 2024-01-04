@@ -61,14 +61,14 @@ function MProductRadioOptions({
         as={Col}
         md="4"
         className="cursor-pointer"
-        onClick={() => handleRadioSelection("Dashboard and Reporting")}
+        onClick={() => handleRadioSelection("Frequency")}
       >
         <Form.Check
           type="radio"
           name="firstName"
-          label="Dashboard and Reporting"
+          label="Frequency"
           className="height1 custom-checkbox mb-3"
-          checked={selectedOption === "Dashboard and Reporting"}
+          checked={selectedOption === "Frequency"}
         />
       </Form.Group>
       

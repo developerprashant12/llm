@@ -80,7 +80,7 @@ function CompetitorReportingComponent() {
 
     const sectionsData = checkedItemStore.map(() => {
       const match = matches.next().value;
-      const data = match && match[1] ? match[1].trim() : "";
+      const data = match && match[1] ? match[1].trim().replace(/:/g, '') : "";
       return data;
     });
     return sectionsData;

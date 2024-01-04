@@ -41,6 +41,11 @@ function ComparisonReportingComponent() {
   };
   const tdStyle = {
     border: "1px solid rgb(133, 111, 111) !import",
+    width: "500px",
+  };
+  const tdStyle1 = {
+    border: "1px solid rgb(133, 111, 111) !import",
+    width: "230px",
   };
   const mark = {
     border: "1px solid rgb(120 111 111 / 88%)",
@@ -65,26 +70,43 @@ function ComparisonReportingComponent() {
     paddingTop: "16px",
     marginBottom: "0",
   };
+
   const reportMainHeading = {
     borderBottom: "2px solid #000",
   };
+
   const extractSections = (content) => {
+    // Escape special characters in checkedItemStore
+    const escapedCheckedItemStore = checkedItemStore.map((item) =>
+      item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    );
+  
+
+    console.log("escapedCheckedItemStore",escapedCheckedItemStore)
+    // Adjusted regex pattern to include special characters within lookbehind and lookahead
     const regexPattern = new RegExp(
-      `(?<=${checkedItemStore.join("|")}:)(.*?)(?=${checkedItemStore
+      `(?<=${escapedCheckedItemStore.join("|")}:)(.*?)(?=${escapedCheckedItemStore
         .slice(1)
         .join("|")}:|$)`,
       "gs"
     );
 
+    console.log("regexPattern",regexPattern)
+  
     const matches = content.matchAll(regexPattern);
 
+    console.log("matches",matches)
+
+  
     const sectionsData = checkedItemStore.map(() => {
       const match = matches.next().value;
-      const data = match && match[1] ? match[1].trim() : "";
+      const data = match && match[1] ? match[1].trim().replace(/:/g, '') : "";
       return data;
     });
     return sectionsData;
   };
+  
+  console.log(dataItem)
 
   return (
     <div>
@@ -95,7 +117,7 @@ function ComparisonReportingComponent() {
         <h4 className="" style={reportHeading}>
           LLM Comparison Report
         </h4>
-        <Table striped bordered hover responsive className="mt-3">
+        <Table striped bordered hover responsive className="mt-1">
           <thead>
             <tr
               style={{
@@ -124,16 +146,15 @@ function ComparisonReportingComponent() {
           <tbody>
             {checkedItemStore.map((dataType, index) => (
               <tr key={index}>
-                <td style={tdStyle}>{dataType}</td>
+                <td style={tdStyle1}>{dataType}</td>
                 {Object.keys(dataItem).map((source) => {
                   const sectionsData = extractSections(dataItem[source][0]);
-                  {
-                    /* console.log("sectionsData", sectionsData); */
-                  }
                   const data = sectionsData[index] || "";
                   return (
                     <td key={source} style={tdStyle}>
-                      {data}
+                     <Markdown className="markTable">
+                    {data}
+                    </Markdown>
                     </td>
                   );
                 })}
