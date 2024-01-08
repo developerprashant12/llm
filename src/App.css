@@ -68,21 +68,16 @@
   font-weight: 370 !important;
 }
 
-
-
-
 .height3 {
   padding: 8px 14px !important;
   border-radius: 2px !important;
-  font-size: 19px ;
+  font-size: 19px !important;
   color: #9da3a9 !important;
   cursor: pointer;
   box-shadow: none !important;
   border: none !important;
   font-weight: 350 !important;
 }
-
-
 
 .height2 {
   padding: 8px 14px !important;
@@ -91,9 +86,6 @@
   cursor: pointer;
   font-weight: 100 !important;
 }
-
-
-
 
 .custom-placeholder::placeholder {
   font-size: 21px !important;
@@ -117,10 +109,8 @@
   font-weight: 220 !important;
 }
 
-
-
 input.form-check-input {
-  background-image: url('/public/check-mark.png') ;
+  background-image: url("/public/check-mark.png");
 }
 
 /* .form-check-input:checked {
@@ -174,7 +164,6 @@ ul.nav.brand-tabs a {
   font-size: 18px;
 }
 
-
 .dropdown-toggle::after {
   display: inline-block;
   margin-left: 9.855em !important;
@@ -185,22 +174,39 @@ ul.nav.brand-tabs a {
   border-bottom: 0;
   border-left: 0.3em solid transparent;
 }
-
-/*----------- Media Query Code  --------------*/
 @media screen and (max-width: 420px) {
   .dropdown-toggle::after {
     margin-left: 90px !important;
   }
-
-  .dropdownllms {
-    margin-bottom: 25px;
-  }
-
-  
+  /* 
+  body {
+    background-color: red !important;
+  } */
 }
-/*----------- Media Query Code  --------------*/
-
-
+@media screen and (max-width: 767px) {
+  textarea.big1.form-control {
+    width: 100% !important;
+  }
+}
+button#dropdown-basic {
+  width: 100%;
+}
+span.dropdown-text.lucnhbtn {
+  float: left;
+}
+.dropdown-toggle::after {
+  float: right;
+  margin-top: 12px !important;
+}
+.border .p-3 {
+  padding: 1rem 4px !important;
+}
+.dropdownllms.dropdown {
+  margin-bottom: 1rem;
+}
+.form-check-input[type="radio"] {
+  border-color: #898a8c;
+}
 .btn.show {
   border: none !important;
 }
@@ -263,7 +269,7 @@ button:focus:not(:focus-visible) {
   border-color: none !important;
 }
 
-.mb{
+.mb {
   margin-bottom: 5rem;
 }
 
@@ -303,9 +309,9 @@ ul.focus-on {
   list-style: none;
   padding: 0 20px;
 }
-
-ul.focus-on li{
-  margin-bottom: 5px;
+ul.focus-on li {
+  margin-bottom: 15px;
+  line-height: 25px;
 }
 
 .card-header-actions {
@@ -427,25 +433,24 @@ svg:not(:root) {
 }
 
 .borderSet {
-   position: relative;
+  position: relative;
 }
 
 .text1 {
   position: absolute;
-    top: -17px;
-    background: #f6f9fa;
-    padding: 0px 10px;
-    left: 40px;
+  top: -17px;
+  background: #f6f9fa;
+  padding: 0px 10px;
+  left: 40px;
 }
 
-
-.back{
+.back {
   background-color: #eceff0;
   margin-top: -30px;
 }
 
 .mt {
-  margin-top: 6rem ;
+  margin-top: 6rem;
 }
 
 a {
@@ -620,8 +625,6 @@ a {
   right: 15px;
   opacity: 1;
 }
-
-
 
 .botIcon .Messenger_messenger {
   display: -webkit-box;
@@ -833,7 +836,7 @@ p {
   width: 100%;
 }
 
-.Messages { 
+.Messages {
   color: #ccc !important;
 }
 
@@ -843,11 +846,11 @@ hr {
 
 .compitorsbox {
   display: flex;
-    gap: 20px;
-    background: #cccccc5e;
-    width: 44%;
-    margin: 16px 0 16px 18px;
-    padding: 3px 10px;
+  gap: 20px;
+  background: #cccccc5e;
+  width: 44%;
+  margin: 16px 0 16px 18px;
+  padding: 3px 10px;
 }
 
 .compitorsbox span {
@@ -879,7 +882,7 @@ ul.nav.brand-tabs .active span:after {
   background: #fff;
   width: 6px;
   height: 6px;
-  content: '';
+  content: "";
   top: 4px;
   left: 4px;
   border-radius: 50%;
@@ -889,7 +892,6 @@ input[type="text"] {
   color: black !important;
   font-weight: 360 !important;
 }
-
 
 .markTable table {
   caption-side: bottom;
@@ -918,16 +920,14 @@ tr {
   border-width: 1px !important;
 }
 
-
 .big {
-    padding: 18px 14px !important;
-      border-radius: 2px !important;
-      font-size: 20px !important;
-      box-shadow: none !important;
-      border: 1px solid #9da3a982 !important;
-      font-weight: 100 !important;
+  padding: 18px 14px !important;
+  border-radius: 2px !important;
+  font-size: 20px !important;
+  box-shadow: none !important;
+  border: 1px solid #9da3a982 !important;
+  font-weight: 100 !important;
 }
-
 
 .big1 {
   padding: 6px 5px !important;
@@ -938,11 +938,11 @@ tr {
   font-weight: 100 !important;
 }
 
-textarea{
-    color: black !important;
-    font-weight: 360 !important;
-    overflow: hidden;
-  }
+textarea {
+  color: black !important;
+  font-weight: 360 !important;
+  overflow: hidden;
+}
 
 .initialChanges {
   display: flex;
@@ -952,8 +952,4 @@ textarea{
 .topData {
   margin-top: -20px !important;
   margin-left: 20px;
-}
-
-.react-toastify__toast-body {
-  border-bottom: none !important;
 }
